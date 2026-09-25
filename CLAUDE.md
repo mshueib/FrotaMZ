@@ -40,6 +40,11 @@ Para voltar aos dados de exemplo no browser: apagar `localStorage['frotamz-demo-
    `overlap` (conflito de reservas), `alerts` (lista do painel), `fatSub`/`fatIva`/`fatTot`.
    Motoristas: `mEstado` (calculado, nunca guardado: `inativo` → `ferias` se hoje ∈ `feriasInicio..feriasFim` → `servico` se tem aluguer `curso` → `disponivel`),
    `mConflito` (inativo, de férias, já atribuído a outro aluguer no período, carta caduca antes da devolução), `feriasErro`.
+   Combustível: `fillCons` (cada abastecimento cobre os km desde o anterior da mesma viatura), `consRef` (viatura `consumoRef`
+   ou mediana do histórico com ≥3 medições), `consDesvio` (anormal se acima de `config.toleranciaConsumo`, 20% por omissão).
+   Período: `periodo()` lê `filters.per` (mes, mesant, 3m, ano, tudo, pers + `pDe`/`pAte`), partilhado por Custos e Relatórios;
+   `vStats(v, P)` calcula tudo dentro do período. `verConsumo(viaturaId)` abre na gaveta (larga) o histórico de abastecimentos
+   com gráfico de consumo vs. referência/limite e o excesso em litros e MT (`data-cons` em linhas `tr` ou botões).
 4. **Vistas**: `viewPainel`, `viewViaturas`, `viewMotoristas` (quadro Disponíveis / Em serviço / De férias + lista; com `filters.mid` mostra `viewMotorista`, o painel individual), `viewReservas`, `viewClientes`, `viewFaturas`, `viewCustos`, `viewManutencao`, `viewRelatorios`, `viewDefinicoes` — devolvem HTML em string; `render()` redesenha tudo.
 5. **Formulários**: `openDrawer(title, fields, init, onSubmit, opts)` gera o formulário a partir de uma lista de campos.
 6. **Eventos**: um único listener de `click` com `data-*` (`data-view`, `data-new`, `data-edit="colecao:id"`, `data-ent`, `data-dev`, `data-faturar`, `data-fat`…).
@@ -50,6 +55,13 @@ Para voltar aos dados de exemplo no browser: apagar `localStorage['frotamz-demo-
 
 Aluguer com motorista: a reserva pode ter `motoristaId` + `tarifaMotorista` (MT/dia, por omissão a `tarifa` do motorista).
 `resValor` soma viatura + motorista; a fatura ganha a linha "Serviço de motorista". Sem motorista, o cliente conduz (`condutores`).
+
+## Requisições de combustível
+
+Coleção `requisicoes`, numeração `RC AAAA/NNNN`. `pendente` (por verificar) → **Verificar** (`verificarReq`: litros/preço reais e km;
+cria o abastecimento com `requisicaoId` e grava `abastecimentoId`, `valorReal`) → `verificada` (por pagar) → **Pagar** (`pagarReq`:
+`faturaNr`, `reciboNr`, `dataPag`, `valorPago`, `formaPag`) → `paga`. Também `anulada`. Várias requisições podem partilhar a mesma
+fatura do posto (faturação mensal), por isso não há bloqueio de duplicados. Alertas: por verificar há >7 dias, por pagar há >30 dias.
 
 ## Regras do domínio (Moçambique)
 

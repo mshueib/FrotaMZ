@@ -88,6 +88,28 @@ main{min-width:0;padding-inline:clamp(16px,3vw,36px);padding-block:26px 60px}
 .board .panel-h h2{font-size:16.5px}
 .m-ctx{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .mono{font-family:var(--f-mono);font-size:13px}
+.dates{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dates .search{width:auto}
+tr.row-link{cursor:pointer}
+.drawer-p.wide{width:min(760px,100%)}
+.kpis.mini{margin:0;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.kpis.mini .kpi{padding:10px 12px}
+.kpis.mini .kpi b{font-size:22px}
+/* gráfico de consumo por abastecimento */
+.cchart{position:relative;height:190px;border-bottom:1px solid var(--line);margin:18px 0 22px;padding:0 4px}
+.cbars{position:absolute;inset:0 0 0 0;display:flex;gap:6px;align-items:flex-end;padding:0 4px}
+.cbar{flex:1 1 0;max-width:56px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;min-width:0}
+.cbar i{display:block;width:100%;background:var(--accent);border-radius:4px 4px 0 0;opacity:.85}
+.cbar.crit i{background:var(--crit);opacity:1}
+.cbar b{font-size:11.5px;font-variant-numeric:tabular-nums;margin-bottom:3px;white-space:nowrap}
+.cbar.crit b{color:var(--crit)}
+.cbar small{position:absolute;bottom:-19px;font-size:11px;color:var(--muted);white-space:nowrap}
+.cline{position:absolute;left:0;right:0;border-top:1.5px dashed var(--muted);z-index:1;pointer-events:none}
+.cline.tol{border-color:var(--crit);opacity:.75}
+.cline span{position:absolute;right:0;top:-17px;font-size:11px;color:var(--muted);background:var(--surface);padding:0 4px}
+.cline.tol span{color:var(--crit)}
+tr.row-crit td{background:color-mix(in srgb,var(--crit-soft) 55%,transparent)}
+tr.row-crit td:first-child{box-shadow:inset 3px 0 0 var(--crit)}
 .alerts .t{font-weight:600}
 .alerts .m{color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .empty{padding:26px 16px;text-align:center;color:var(--muted)}

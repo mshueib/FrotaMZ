@@ -5,7 +5,8 @@ window.SAMPLE = {
     "nuit": "400000000",
     "endereco": "Av. Julius Nyerere, 1250, Maputo",
     "telefone": "+258 84 000 0000",
-    "iva": 16
+    "iva": 16,
+    "toleranciaConsumo": 20
   },
   "viaturas": [
     {
@@ -18,10 +19,11 @@ window.SAMPLE = {
       "combustivel": "Diesel",
       "km": 68450,
       "estado": "disponivel",
-      "tarifa": 4500,
       "seguro": "2026-10-08",
       "inspecao": "2027-02-14",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 4500,
+      "consumoRef": 9.5
     },
     {
       "id": "v2",
@@ -33,10 +35,11 @@ window.SAMPLE = {
       "combustivel": "Gasolina",
       "km": 91200,
       "estado": "alugada",
-      "tarifa": 3200,
       "seguro": "2027-03-01",
       "inspecao": "2026-09-30",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 3200,
+      "consumoRef": 7
     },
     {
       "id": "v3",
@@ -48,10 +51,11 @@ window.SAMPLE = {
       "combustivel": "Diesel",
       "km": 142800,
       "estado": "manutencao",
-      "tarifa": 7500,
       "seguro": "2027-01-20",
       "inspecao": "2027-01-05",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 7500,
+      "consumoRef": 11.5
     },
     {
       "id": "v4",
@@ -63,10 +67,11 @@ window.SAMPLE = {
       "combustivel": "Diesel",
       "km": 31900,
       "estado": "disponivel",
-      "tarifa": 4000,
       "seguro": "2027-05-11",
       "inspecao": "2027-06-02",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 4000,
+      "consumoRef": 7.2
     },
     {
       "id": "v5",
@@ -78,10 +83,11 @@ window.SAMPLE = {
       "combustivel": "Gasolina",
       "km": 54300,
       "estado": "alugada",
-      "tarifa": 2200,
       "seguro": "2026-09-20",
       "inspecao": "2027-04-18",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 2200,
+      "consumoRef": 5.5
     },
     {
       "id": "v6",
@@ -93,10 +99,11 @@ window.SAMPLE = {
       "combustivel": "Diesel",
       "km": 188600,
       "estado": "disponivel",
-      "tarifa": 6000,
       "seguro": "2027-02-28",
       "inspecao": "2026-11-15",
-      "licenca": "2026-12-31"
+      "licenca": "2026-12-31",
+      "tarifa": 6000,
+      "consumoRef": 10.5
     }
   ],
   "motoristas": [
@@ -160,6 +167,128 @@ window.SAMPLE = {
       "estado": "inativo"
     }
   ],
+  "requisicoes": [
+    {
+      "id": "rq1",
+      "numero": "RC 2026/0001",
+      "data": "2026-08-25",
+      "viaturaId": "v4",
+      "motoristaId": "m2",
+      "posto": "Galp Matola",
+      "litros": 55,
+      "precoLitro": 87.97,
+      "finalidade": "Serviço interno",
+      "estado": "paga",
+      "dataAbast": "2026-08-25",
+      "km": 31100,
+      "litrosReais": 55,
+      "precoReal": 87.97,
+      "valorReal": 4838.35,
+      "abastecimentoId": "a10",
+      "dataVerif": "2026-08-25",
+      "faturaNr": "FT GM/2026/0412",
+      "reciboNr": "RE GM/2026/0389",
+      "dataPag": "2026-09-05",
+      "valorPago": 4838.35,
+      "formaPag": "Transferência bancária"
+    },
+    {
+      "id": "rq2",
+      "numero": "RC 2026/0002",
+      "data": "2026-09-12",
+      "viaturaId": "v4",
+      "motoristaId": "m2",
+      "posto": "Galp Matola",
+      "litros": 60,
+      "precoLitro": 87.97,
+      "finalidade": "Deslocação a Xai-Xai",
+      "estado": "verificada",
+      "dataAbast": "2026-09-12",
+      "km": 31880,
+      "litrosReais": 70,
+      "precoReal": 87.97,
+      "valorReal": 6157.9,
+      "abastecimentoId": "a11",
+      "dataVerif": "2026-09-12",
+      "obsVerif": "Talão indica 70 L; pedido era de 60 L"
+    },
+    {
+      "id": "rq3",
+      "numero": "RC 2026/0003",
+      "data": "2026-09-22",
+      "viaturaId": "v2",
+      "motoristaId": "m1",
+      "posto": "Petromoc 24 de Julho",
+      "litros": 43,
+      "precoLitro": 86.97,
+      "finalidade": "Aluguer com motorista (Helena Macuácua)",
+      "estado": "verificada",
+      "dataAbast": "2026-09-22",
+      "km": 91180,
+      "litrosReais": 43,
+      "precoReal": 86.97,
+      "valorReal": 3739.71,
+      "abastecimentoId": "a06",
+      "dataVerif": "2026-09-22"
+    },
+    {
+      "id": "rq4",
+      "numero": "RC 2026/0004",
+      "data": "2026-09-23",
+      "viaturaId": "v5",
+      "posto": "Petromoc 24 de Julho",
+      "litros": 31,
+      "precoLitro": 86.97,
+      "finalidade": "Entrega ao cliente",
+      "estado": "paga",
+      "dataAbast": "2026-09-23",
+      "km": 54280,
+      "litrosReais": 31,
+      "precoReal": 86.97,
+      "valorReal": 2696.07,
+      "abastecimentoId": "a13",
+      "dataVerif": "2026-09-23",
+      "faturaNr": "FT 2026/A/2231",
+      "reciboNr": "RE 2026/A/1904",
+      "dataPag": "2026-09-24",
+      "valorPago": 2696.07,
+      "formaPag": "M-Pesa"
+    },
+    {
+      "id": "rq5",
+      "numero": "RC 2026/0005",
+      "data": "2026-09-15",
+      "viaturaId": "v1",
+      "motoristaId": "m4",
+      "posto": "Petromoc 24 de Julho",
+      "litros": 60,
+      "precoLitro": 87.97,
+      "finalidade": "Preparar viatura para reserva",
+      "estado": "pendente"
+    },
+    {
+      "id": "rq6",
+      "numero": "RC 2026/0006",
+      "data": "2026-09-24",
+      "viaturaId": "v6",
+      "posto": "Total Energies Marginal",
+      "litros": 70,
+      "precoLitro": 87.97,
+      "finalidade": "Transfer aeroporto",
+      "estado": "pendente"
+    },
+    {
+      "id": "rq7",
+      "numero": "RC 2026/0007",
+      "data": "2026-09-18",
+      "viaturaId": "v3",
+      "posto": "Petromoc 24 de Julho",
+      "litros": 80,
+      "precoLitro": 87.97,
+      "finalidade": "Viatura foi para a oficina",
+      "estado": "anulada"
+    }
+  ],
   "abastecimentos": [
     {
       "id": "a01",
@@ -213,7 +342,8 @@ window.SAMPLE = {
       "km": 91180,
       "litros": 43,
       "precoLitro": 86.97,
-      "posto": "Petromoc 24 de Julho"
+      "posto": "Petromoc 24 de Julho",
+      "requisicaoId": "rq3"
     },
     {
       "id": "a07",
@@ -249,7 +379,8 @@ window.SAMPLE = {
       "km": 31100,
       "litros": 55,
       "precoLitro": 87.97,
-      "posto": "Galp Matola"
+      "posto": "Galp Matola",
+      "requisicaoId": "rq1"
     },
     {
       "id": "a11",
@@ -258,7 +389,8 @@ window.SAMPLE = {
       "km": 31880,
       "litros": 70,
       "precoLitro": 87.97,
-      "posto": "Galp Matola"
+      "posto": "Galp Matola",
+      "requisicaoId": "rq2"
     },
     {
       "id": "a12",
@@ -276,7 +408,8 @@ window.SAMPLE = {
       "km": 54280,
       "litros": 31,
       "precoLitro": 86.97,
-      "posto": "Petromoc 24 de Julho"
+      "posto": "Petromoc 24 de Julho",
+      "requisicaoId": "rq4"
     },
     {
       "id": "a14",
@@ -295,6 +428,24 @@ window.SAMPLE = {
       "litros": 118,
       "precoLitro": 87.97,
       "posto": "Petromoc Xai-Xai"
+    },
+    {
+      "id": "a16",
+      "viaturaId": "v4",
+      "data": "2026-07-08",
+      "km": 29600,
+      "litros": 50,
+      "precoLitro": 86.5,
+      "posto": "Galp Matola"
+    },
+    {
+      "id": "a17",
+      "viaturaId": "v4",
+      "data": "2026-07-27",
+      "km": 30320,
+      "litros": 52.5,
+      "precoLitro": 86.5,
+      "posto": "Galp Matola"
     }
   ],
   "despesas": [
