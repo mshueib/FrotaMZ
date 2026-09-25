@@ -47,7 +47,12 @@ Para voltar aos dados de exemplo no browser: apagar `localStorage['frotamz-demo-
    com gráfico de consumo vs. referência/limite e o excesso em litros e MT (`data-cons` em linhas `tr` ou botões).
 4. **Vistas**: `viewPainel`, `viewViaturas`, `viewMotoristas` (quadro Disponíveis / Em serviço / De férias + lista; com `filters.mid` mostra `viewMotorista`, o painel individual), `viewReservas`, `viewClientes`, `viewFaturas`, `viewCustos`, `viewManutencao`, `viewRelatorios`, `viewDefinicoes` — devolvem HTML em string; `render()` redesenha tudo.
 5. **Formulários**: `openDrawer(title, fields, init, onSubmit, opts)` gera o formulário a partir de uma lista de campos.
+   Tipos extra: `{type:'section',label}` (título de secção) e `{type:'note',html}`; `ro:1` = só leitura. Campos obrigatórios em falta
+   ficam marcados (`.fld.invalid`) com a mensagem no topo; `opts.validate` devolve texto ou `{k, msg}` para marcar um campo.
+   O botão fica "A guardar…" enquanto grava. `opts.change(e)` corre ao abrir e em cada `input`/`change`.
 6. **Eventos**: um único listener de `click` com `data-*` (`data-view`, `data-new`, `data-edit="colecao:id"`, `data-ent`, `data-dev`, `data-faturar`, `data-fat`…).
+   Linhas clicáveis: `tr[data-open]` (`rq:id`, `mot:id`, `edit:colecao:id`) e `tr[data-cons]`; também abrem com Enter.
+   O menu mostra contadores (alertas urgentes, devoluções em atraso, requisições por verificar/pagar).
 
 ## Fluxo do aluguer
 
@@ -58,10 +63,16 @@ Aluguer com motorista: a reserva pode ter `motoristaId` + `tarifaMotorista` (MT/
 
 ## Requisições de combustível
 
-Coleção `requisicoes`, numeração `RC AAAA/NNNN`. `pendente` (por verificar) → **Verificar** (`verificarReq`: litros/preço reais e km;
+Coleção `requisicoes`. O `numero` é **digitado à mão** (nº do livro de requisições), normalizado com `normNum` e único (ignora espaços e maiúsculas). `pendente` (por verificar) → **Verificar** (`verificarReq`: litros/preço reais e km;
 cria o abastecimento com `requisicaoId` e grava `abastecimentoId`, `valorReal`) → `verificada` (por pagar) → **Pagar** (`pagarReq`:
 `faturaNr`, `reciboNr`, `dataPag`, `valorPago`, `formaPag`) → `paga`. Também `anulada`. Várias requisições podem partilhar a mesma
 fatura do posto (faturação mensal), por isso não há bloqueio de duplicados. Alertas: por verificar há >7 dias, por pagar há >30 dias.
+
+Bombas de combustível: coleção `postos` (`nome`, `precoDiesel`, `precoGasolina`, `precoData`, `historico[]`, `estado`).
+A requisição guarda `postoId`, `posto` (nome), `combustivel` (`combDe(viatura)`: híbrido → Gasolina, elétrico → nenhum) e
+`precoLitro` copiado da bomba no momento da emissão — campo só de leitura (`ro:1` no `openDrawer`), recalculado ao guardar.
+Na verificação o preço também é fixo (`precoReal = precoLitro`). Mudar o preço da bomba não altera requisições já emitidas.
+`openDrawer` aceita `opts.change(e)` (chamado em cada `change` do formulário e uma vez ao abrir) e dicas com id `h_<campo>`.
 
 ## Regras do domínio (Moçambique)
 

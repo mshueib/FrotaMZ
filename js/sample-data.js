@@ -167,6 +167,125 @@ window.SAMPLE = {
       "estado": "inativo"
     }
   ],
+  "postos": [
+    {
+      "id": "p1",
+      "nome": "Petromoc Julius Nyerere",
+      "localizacao": "Av. Julius Nyerere, Maputo",
+      "telefone": "+258 21 490 100",
+      "nuit": "400011223",
+      "historico": [
+        {
+          "data": "2026-01-10",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        }
+      ],
+      "precoDiesel": 87.97,
+      "precoGasolina": 86.97,
+      "precoData": "2026-01-10",
+      "estado": "ativo"
+    },
+    {
+      "id": "p2",
+      "nome": "Petromoc 24 de Julho",
+      "localizacao": "Av. 24 de Julho, Maputo",
+      "telefone": "+258 21 303 220",
+      "nuit": "400011224",
+      "historico": [
+        {
+          "data": "2026-01-10",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        }
+      ],
+      "precoDiesel": 87.97,
+      "precoGasolina": 86.97,
+      "precoData": "2026-01-10",
+      "estado": "ativo"
+    },
+    {
+      "id": "p3",
+      "nome": "Galp Matola",
+      "localizacao": "EN4, Matola",
+      "telefone": "+258 21 720 540",
+      "nuit": "400238871",
+      "historico": [
+        {
+          "data": "2026-06-01",
+          "precoDiesel": 86.5,
+          "precoGasolina": 85.5
+        },
+        {
+          "data": "2026-08-01",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        }
+      ],
+      "precoDiesel": 87.97,
+      "precoGasolina": 86.97,
+      "precoData": "2026-08-01",
+      "estado": "ativo"
+    },
+    {
+      "id": "p4",
+      "nome": "Total Marginal",
+      "localizacao": "Av. da Marginal, Maputo",
+      "telefone": "+258 21 498 300",
+      "nuit": "400156002",
+      "historico": [
+        {
+          "data": "2026-01-10",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        },
+        {
+          "data": "2026-09-20",
+          "precoDiesel": 87.5,
+          "precoGasolina": 86.5
+        }
+      ],
+      "precoDiesel": 87.5,
+      "precoGasolina": 86.5,
+      "precoData": "2026-09-20",
+      "estado": "ativo"
+    },
+    {
+      "id": "p5",
+      "nome": "Engen Machava",
+      "localizacao": "Av. de Moçambique, Machava",
+      "telefone": "+258 21 751 880",
+      "nuit": "400372210",
+      "historico": [
+        {
+          "data": "2026-01-10",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        }
+      ],
+      "precoDiesel": 87.97,
+      "precoGasolina": 86.97,
+      "precoData": "2026-01-10",
+      "estado": "ativo"
+    },
+    {
+      "id": "p6",
+      "nome": "Petromoc Xai-Xai",
+      "localizacao": "EN1, Xai-Xai, Gaza",
+      "telefone": "+258 282 22 150",
+      "historico": [
+        {
+          "data": "2026-01-10",
+          "precoDiesel": 87.97,
+          "precoGasolina": 86.97
+        }
+      ],
+      "estado": "inativo",
+      "precoDiesel": 87.97,
+      "precoGasolina": 86.97,
+      "precoData": "2026-01-10"
+    }
+  ],
   "requisicoes": [
     {
       "id": "rq1",
@@ -190,7 +309,9 @@ window.SAMPLE = {
       "reciboNr": "RE GM/2026/0389",
       "dataPag": "2026-09-05",
       "valorPago": 4838.35,
-      "formaPag": "Transferência bancária"
+      "formaPag": "Transferência bancária",
+      "postoId": "p3",
+      "combustivel": "Diesel"
     },
     {
       "id": "rq2",
@@ -210,7 +331,9 @@ window.SAMPLE = {
       "valorReal": 6157.9,
       "abastecimentoId": "a11",
       "dataVerif": "2026-09-12",
-      "obsVerif": "Talão indica 70 L; pedido era de 60 L"
+      "obsVerif": "Talão indica 70 L; pedido era de 60 L",
+      "postoId": "p3",
+      "combustivel": "Diesel"
     },
     {
       "id": "rq3",
@@ -229,7 +352,9 @@ window.SAMPLE = {
       "precoReal": 86.97,
       "valorReal": 3739.71,
       "abastecimentoId": "a06",
-      "dataVerif": "2026-09-22"
+      "dataVerif": "2026-09-22",
+      "postoId": "p2",
+      "combustivel": "Gasolina"
     },
     {
       "id": "rq4",
@@ -252,7 +377,9 @@ window.SAMPLE = {
       "reciboNr": "RE 2026/A/1904",
       "dataPag": "2026-09-24",
       "valorPago": 2696.07,
-      "formaPag": "M-Pesa"
+      "formaPag": "M-Pesa",
+      "postoId": "p2",
+      "combustivel": "Gasolina"
     },
     {
       "id": "rq5",
@@ -264,18 +391,22 @@ window.SAMPLE = {
       "litros": 60,
       "precoLitro": 87.97,
       "finalidade": "Preparar viatura para reserva",
-      "estado": "pendente"
+      "estado": "pendente",
+      "postoId": "p2",
+      "combustivel": "Diesel"
     },
     {
       "id": "rq6",
       "numero": "RC 2026/0006",
       "data": "2026-09-24",
       "viaturaId": "v6",
-      "posto": "Total Energies Marginal",
+      "posto": "Total Marginal",
       "litros": 70,
-      "precoLitro": 87.97,
+      "precoLitro": 87.5,
       "finalidade": "Transfer aeroporto",
-      "estado": "pendente"
+      "estado": "pendente",
+      "postoId": "p4",
+      "combustivel": "Diesel"
     },
     {
       "id": "rq7",
@@ -286,7 +417,9 @@ window.SAMPLE = {
       "litros": 80,
       "precoLitro": 87.97,
       "finalidade": "Viatura foi para a oficina",
-      "estado": "anulada"
+      "estado": "anulada",
+      "postoId": "p2",
+      "combustivel": "Diesel"
     }
   ],
   "abastecimentos": [
@@ -297,7 +430,8 @@ window.SAMPLE = {
       "km": 67200,
       "litros": 60,
       "precoLitro": 87.97,
-      "posto": "Petromoc Julius Nyerere"
+      "posto": "Petromoc Julius Nyerere",
+      "postoId": "p1"
     },
     {
       "id": "a02",
@@ -306,7 +440,8 @@ window.SAMPLE = {
       "km": 67820,
       "litros": 58,
       "precoLitro": 87.97,
-      "posto": "Total Marginal"
+      "posto": "Total Marginal",
+      "postoId": "p4"
     },
     {
       "id": "a03",
@@ -315,7 +450,8 @@ window.SAMPLE = {
       "km": 68430,
       "litros": 61,
       "precoLitro": 87.97,
-      "posto": "Petromoc Julius Nyerere"
+      "posto": "Petromoc Julius Nyerere",
+      "postoId": "p1"
     },
     {
       "id": "a04",
@@ -324,7 +460,8 @@ window.SAMPLE = {
       "km": 89900,
       "litros": 42,
       "precoLitro": 86.97,
-      "posto": "Galp Matola"
+      "posto": "Galp Matola",
+      "postoId": "p3"
     },
     {
       "id": "a05",
@@ -333,7 +470,8 @@ window.SAMPLE = {
       "km": 90560,
       "litros": 45,
       "precoLitro": 86.97,
-      "posto": "Total Marginal"
+      "posto": "Total Marginal",
+      "postoId": "p4"
     },
     {
       "id": "a06",
@@ -343,7 +481,8 @@ window.SAMPLE = {
       "litros": 43,
       "precoLitro": 86.97,
       "posto": "Petromoc 24 de Julho",
-      "requisicaoId": "rq3"
+      "requisicaoId": "rq3",
+      "postoId": "p2"
     },
     {
       "id": "a07",
@@ -352,7 +491,8 @@ window.SAMPLE = {
       "km": 141200,
       "litros": 80,
       "precoLitro": 87.97,
-      "posto": "Petromoc Julius Nyerere"
+      "posto": "Petromoc Julius Nyerere",
+      "postoId": "p1"
     },
     {
       "id": "a08",
@@ -361,7 +501,8 @@ window.SAMPLE = {
       "km": 142000,
       "litros": 88,
       "precoLitro": 87.97,
-      "posto": "Engen Machava"
+      "posto": "Engen Machava",
+      "postoId": "p5"
     },
     {
       "id": "a09",
@@ -370,7 +511,8 @@ window.SAMPLE = {
       "km": 142780,
       "litros": 86,
       "precoLitro": 87.97,
-      "posto": "Engen Machava"
+      "posto": "Engen Machava",
+      "postoId": "p5"
     },
     {
       "id": "a10",
@@ -380,7 +522,8 @@ window.SAMPLE = {
       "litros": 55,
       "precoLitro": 87.97,
       "posto": "Galp Matola",
-      "requisicaoId": "rq1"
+      "requisicaoId": "rq1",
+      "postoId": "p3"
     },
     {
       "id": "a11",
@@ -390,7 +533,8 @@ window.SAMPLE = {
       "litros": 70,
       "precoLitro": 87.97,
       "posto": "Galp Matola",
-      "requisicaoId": "rq2"
+      "requisicaoId": "rq2",
+      "postoId": "p3"
     },
     {
       "id": "a12",
@@ -399,7 +543,8 @@ window.SAMPLE = {
       "km": 53700,
       "litros": 28,
       "precoLitro": 86.97,
-      "posto": "Total Marginal"
+      "posto": "Total Marginal",
+      "postoId": "p4"
     },
     {
       "id": "a13",
@@ -409,7 +554,8 @@ window.SAMPLE = {
       "litros": 31,
       "precoLitro": 86.97,
       "posto": "Petromoc 24 de Julho",
-      "requisicaoId": "rq4"
+      "requisicaoId": "rq4",
+      "postoId": "p2"
     },
     {
       "id": "a14",
@@ -418,7 +564,8 @@ window.SAMPLE = {
       "km": 187500,
       "litros": 65,
       "precoLitro": 87.97,
-      "posto": "Engen Machava"
+      "posto": "Engen Machava",
+      "postoId": "p5"
     },
     {
       "id": "a15",
@@ -427,7 +574,8 @@ window.SAMPLE = {
       "km": 188580,
       "litros": 118,
       "precoLitro": 87.97,
-      "posto": "Petromoc Xai-Xai"
+      "posto": "Petromoc Xai-Xai",
+      "postoId": "p6"
     },
     {
       "id": "a16",
@@ -436,7 +584,8 @@ window.SAMPLE = {
       "km": 29600,
       "litros": 50,
       "precoLitro": 86.5,
-      "posto": "Galp Matola"
+      "posto": "Galp Matola",
+      "postoId": "p3"
     },
     {
       "id": "a17",
@@ -445,7 +594,8 @@ window.SAMPLE = {
       "km": 30320,
       "litros": 52.5,
       "precoLitro": 86.5,
-      "posto": "Galp Matola"
+      "posto": "Galp Matola",
+      "postoId": "p3"
     }
   ],
   "despesas": [
