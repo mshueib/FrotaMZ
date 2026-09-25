@@ -1,0 +1,12 @@
+{
+  "name": "frotamz",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Protótipo de gestão de frota e rent-a-car para Moçambique",
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes serve -l 5173 .",
+    "sample": "node scripts/gen-sample.mjs",
+    "build:artifact": "node scripts/build-artifact.mjs"
+  }
+}
