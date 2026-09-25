@@ -1,5 +1,5 @@
 const SAMPLE = window.SAMPLE || {config:{}};
-const COLS=['viaturas','abastecimentos','despesas','planos','servicos','clientes','reservas','faturas'];
+const COLS=['viaturas','motoristas','abastecimentos','despesas','planos','servicos','clientes','reservas','faturas'];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=(n,d=0)=>new Intl.NumberFormat('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n||0);
@@ -12,6 +12,7 @@ const dd=s=>{if(!s)return '—';const[y,m,d]=s.split('-');return `${d}/${m}/${y}
 const ddShort=s=>{if(!s)return '';const[y,m,d]=s.split('-');return `${d}/${m}`};
 const days=(a,b)=>Math.round((new Date(b+'T12:00')-new Date(a+'T12:00'))/864e5);
 const addMonths=(s,m)=>{const d=new Date(s+'T12:00');d.setMonth(d.getMonth()+(+m||0));return toISO(d)};
+const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return toISO(d)};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0);
 
@@ -20,6 +21,7 @@ let mode='loading', db=null, view='painel', filters={};
 const VIEWS={
   painel:{t:'Painel',g:'Operação',i:'<path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/>'},
   viaturas:{t:'Viaturas',g:'Operação',i:'<path d="M5 17h14M3 13l2-6h14l2 6v4h-2M5 17H3v-4"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>'},
+  motoristas:{t:'Motoristas',g:'Operação',i:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M3.5 10.5c5.5-1.6 11.5-1.6 17 0M10 13.8l-3.2 6.4M14 13.8l3.2 6.4"/>'},
   reservas:{t:'Reservas',g:'Rent-a-Car',i:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'},
   clientes:{t:'Clientes',g:'Rent-a-Car',i:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/>'},
   faturas:{t:'Faturação',g:'Rent-a-Car',i:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'},
@@ -34,7 +36,7 @@ const DEMO_KEY='frotamz-demo-v1';
 function loadDemo(){
   let saved=null; try{saved=JSON.parse(localStorage.getItem(DEMO_KEY)||'null')}catch(e){}
   const src=saved||SAMPLE;
-  S={config:{...src.config},...Object.fromEntries(COLS.map(c=>[c,(src[c]||[]).map(x=>({...x}))]))};
+  S={config:{...src.config},...Object.fromEntries(COLS.map(c=>[c,(src[c]??SAMPLE[c]??[]).map(x=>({...x}))]))};
 }
 function persistDemo(){try{localStorage.setItem(DEMO_KEY,JSON.stringify(S))}catch(e){}}
 function errMsg(e){
@@ -81,11 +83,13 @@ async function connect(){
 /* ---------- domain helpers ---------- */
 const V=id=>S.viaturas.find(v=>v.id===id);
 const C=id=>S.clientes.find(c=>c.id===id);
+const M=id=>id?S.motoristas.find(m=>m.id===id):null;
 const vLabel=v=>v?`${v.marca} ${v.modelo}`:'Viatura removida';
 const plate=v=>v?`<span class="plate"><span>${esc(v.matricula)}</span></span>`:'<span class="muted">—</span>';
 const IVA=()=>+(S.config.iva??16);
 const ESTADO_V={disponivel:['Disponível','p-ok'],alugada:['Alugada','p-info'],manutencao:['Na oficina','p-warn'],inativa:['Inativa','p-mute']};
 const ESTADO_R={reservada:['Reservada','p-mute'],curso:['Em curso','p-info'],concluida:['Concluída','p-ok'],cancelada:['Cancelada','p-mute']};
+const ESTADO_M={disponivel:['Disponível','p-ok'],servico:['Em serviço','p-info'],ferias:['De férias','p-warn'],inativo:['Inativo','p-mute']};
 const pill=([t,c])=>`<span class="pill ${c}">${esc(t)}</span>`;
 const DOCS=[['seguro','Seguro automóvel'],['inspecao','Inspeção periódica'],['licenca','Imposto/licença anual']];
 
@@ -114,9 +118,31 @@ const fatSub=f=>sum(f.linhas||[],l=>l.qtd*l.preco);
 const fatIva=f=>fatSub(f)*(+f.iva||0)/100;
 const fatTot=f=>fatSub(f)+fatIva(f);
 const resDias=r=>Math.max(1,days(r.inicio,r.fim));
-const resValor=r=>resDias(r)*(+r.tarifa||0);
+const resMot=r=>r.motoristaId?+r.tarifaMotorista||0:0;
+const resValor=r=>resDias(r)*((+r.tarifa||0)+resMot(r));
 function overlap(r){
   return S.reservas.find(o=>o.id!==r.id&&o.viaturaId===r.viaturaId&&!['cancelada','concluida'].includes(o.estado)&&o.inicio<=r.fim&&r.inicio<=o.fim);
+}
+// Motoristas: férias por período (feriasInicio..feriasFim); "em serviço" = aluguer em curso atribuído.
+const emFerias=(m,a,b=a)=>!!(m&&m.feriasInicio&&m.feriasFim&&m.feriasInicio<=b&&a<=m.feriasFim);
+function mEstado(m){
+  if(m.estado==='inativo')return 'inativo';
+  if(emFerias(m,TODAY))return 'ferias';
+  return S.reservas.some(r=>r.motoristaId===m.id&&r.estado==='curso')?'servico':'disponivel';
+}
+function mOverlap(r){
+  return r.motoristaId&&S.reservas.find(o=>o.id!==r.id&&o.motoristaId===r.motoristaId&&['reservada','curso'].includes(o.estado)&&o.inicio<=r.fim&&r.inicio<=o.fim);
+}
+const mAtual=m=>S.reservas.find(r=>r.motoristaId===m.id&&r.estado==='curso');
+const mProx=m=>S.reservas.filter(r=>r.motoristaId===m.id&&r.estado==='reservada').sort((a,b)=>a.inicio.localeCompare(b.inicio))[0];
+// Erro de atribuição do motorista a uma reserva (null se estiver tudo bem).
+function mConflito(r){
+  const m=M(r.motoristaId); if(!r.motoristaId)return null; if(!m)return 'O motorista escolhido já não existe.';
+  if(m.estado==='inativo')return `${m.nome} está inativo.`;
+  if(emFerias(m,r.inicio,r.fim))return `${m.nome} está de férias de ${dd(m.feriasInicio)} a ${dd(m.feriasFim)}.`;
+  const o=mOverlap(r); if(o)return `${m.nome} já está atribuído a outro aluguer de ${dd(o.inicio)} a ${dd(o.fim)} (${V(o.viaturaId)?.matricula||'—'}).`;
+  if(m.cartaValidade&&m.cartaValidade<r.fim)return `A carta de condução de ${m.nome} caduca a ${dd(m.cartaValidade)}, antes da devolução.`;
+  return null;
 }
 function alerts(){
   const out=[];
@@ -136,6 +162,12 @@ function alerts(){
     if(r.estado==='curso'&&r.fim<TODAY) out.push({lvl:'crit',v,t:'Devolução em atraso',m:`${esc(c?.nome||'Cliente')} devia devolver a ${dd(r.fim)}`,s:-80,go:'reservas',raw:true});
     else if(r.estado==='reservada'&&days(TODAY,r.inicio)<=3) out.push({lvl:'info',v,t:'Entrega agendada',m:`${esc(c?.nome||'Cliente')} levanta a ${dd(r.inicio)}`,s:20,go:'reservas',raw:true});
     if(['reservada','curso'].includes(r.estado)&&c&&c.cartaValidade&&c.cartaValidade<r.fim) out.push({lvl:'warn',v,t:'Carta de condução caduca durante o aluguer',m:`${esc(c.nome)} · válida até ${dd(c.cartaValidade)}`,s:5,go:'clientes',raw:true});
+    const m=M(r.motoristaId);
+    if(r.estado==='reservada'&&m&&emFerias(m,r.inicio,r.fim)) out.push({lvl:'crit',v,t:'Motorista de férias durante o aluguer',m:`${esc(m.nome)} · férias até ${dd(m.feriasFim)}; levantamento a ${dd(r.inicio)}`,s:-40,go:'reservas',raw:true});
+  });
+  S.motoristas.forEach(m=>{ if(m.estado==='inativo'||!m.cartaValidade)return; const d=days(TODAY,m.cartaValidade);
+    if(d<0) out.push({lvl:'crit',who:m.nome,t:'Carta de motorista caducada',m:`há ${-d} ${-d===1?'dia':'dias'} (${dd(m.cartaValidade)})`,s:d,go:'motoristas'});
+    else if(d<=30) out.push({lvl:'warn',who:m.nome,t:'Carta de motorista a caducar',m:`em ${d} ${d===1?'dia':'dias'} (${dd(m.cartaValidade)})`,s:d,go:'motoristas'});
   });
   return out.sort((a,b)=>a.s-b.s);
 }
@@ -250,6 +282,8 @@ function formCliente(c={}){
   ],c,o=>save('clientes',{...c,...o}),{done:'Cliente guardado.',del:c.id?()=>remove('clientes',c.id):null,
    validate:o=>o.nuit&&!/^\d{9}$/.test(o.nuit)?'O NUIT tem 9 dígitos.':null});
 }
+const mOptions=sel=>`<option value="">Sem motorista (o cliente conduz)</option>`+S.motoristas.filter(m=>m.estado!=='inativo'||m.id===sel).sort((a,b)=>a.nome.localeCompare(b.nome))
+  .map(m=>{const e=mEstado(m);return `<option value="${esc(m.id)}"${m.id===sel?' selected':''}>${esc(m.nome)}${e==='disponivel'?'':` (${ESTADO_M[e][0].toLowerCase()})`}</option>`}).join('');
 function formReserva(r={}){
   if(!S.viaturas.length||!S.clientes.length)return toast('Precisa de pelo menos uma viatura e um cliente.');
   const v0=V(r.viaturaId)||S.viaturas.find(v=>v.estado==='disponivel')||S.viaturas[0];
@@ -258,17 +292,48 @@ function formReserva(r={}){
     {k:'viaturaId',label:'Viatura',type:'select',optsHtml:vOptions(r.viaturaId||v0.id,v=>v.estado!=='inativa'),full:1,req:1},
     {k:'inicio',label:'Levantamento',type:'date',def:TODAY,req:1},{k:'fim',label:'Devolução',type:'date',req:1},
     {k:'tarifa',label:'Tarifa diária (MT)',type:'number',step:'0.01',def:v0.tarifa,hint:'Deixe vazio para usar a tarifa da viatura'},{k:'caucao',label:'Caução (MT)',type:'number',step:'0.01',def:0},
-    {k:'condutores',label:'Condutores autorizados',full:1,ph:'Separe por ponto e vírgula'},
-  ],r,async o=>{ if(o.tarifa==null)o.tarifa=V(o.viaturaId)?.tarifa||0; await save('reservas',{estado:'reservada',...r,...o}); },
+    {k:'motoristaId',label:'Motorista da empresa',type:'select',optsHtml:mOptions(r.motoristaId)},
+    {k:'tarifaMotorista',label:'Tarifa do motorista (MT/dia)',type:'number',step:'0.01',min:0,hint:'Vazio = tarifa do motorista'},
+    {k:'condutores',label:'Condutores autorizados',full:1,ph:'Separe por ponto e vírgula',hint:'Pessoas do cliente autorizadas a conduzir, se não houver motorista'},
+  ],r,async o=>{ if(o.tarifa==null)o.tarifa=V(o.viaturaId)?.tarifa||0;
+    if(!o.motoristaId)o.tarifaMotorista=null; else if(o.tarifaMotorista==null)o.tarifaMotorista=+M(o.motoristaId)?.tarifa||0;
+    await save('reservas',{estado:'reservada',...r,...o}); },
   {done:r.id?'Reserva atualizada.':'Reserva criada.',del:r.id&&!r.faturaId?()=>remove('reservas',r.id):null,
    validate:o=>{ if(o.fim<o.inicio)return 'A devolução tem de ser depois do levantamento.';
      const c=overlap({...r,...o}); if(c){const cl=C(c.clienteId);return `A viatura já está reservada de ${dd(c.inicio)} a ${dd(c.fim)} (${cl?.nome||'outro cliente'}).`}
-     const cli=C(o.clienteId); if(cli?.cartaValidade&&cli.cartaValidade<o.fim)return `A carta de condução de ${cli.nome} caduca a ${dd(cli.cartaValidade)}, antes da devolução.`;
+     const mc=mConflito({...r,...o}); if(mc)return mc;
+     const cli=C(o.clienteId); if(!o.motoristaId&&cli?.cartaValidade&&cli.cartaValidade<o.fim)return `A carta de condução de ${cli.nome} caduca a ${dd(cli.cartaValidade)}, antes da devolução.`;
      return null; }});
+}
+function formMotorista(m={}){
+  const ativas=S.reservas.some(r=>r.motoristaId===m.id&&['reservada','curso'].includes(r.estado));
+  openDrawer(m.id?'Editar motorista':'Novo motorista',[
+    {k:'nome',label:'Nome completo',req:1,full:1},
+    {k:'telefone',label:'Telefone',ph:'+258 84 000 0000'},{k:'documento',label:'BI nº',ph:'110100000000A'},
+    {k:'carta',label:'Carta de condução nº',req:1},{k:'cartaCategoria',label:'Categorias',ph:'B, C1'},
+    {k:'cartaValidade',label:'Carta válida até',type:'date',req:1},{k:'tarifa',label:'Tarifa diária (MT)',type:'number',step:'0.01',min:0,def:1500,hint:'Cobrada no aluguer com motorista'},
+    {k:'estado',label:'Situação',type:'select',opts:[['ativo','Ativo no quadro'],['inativo','Inativo (saiu da empresa)']],def:'ativo',full:1},
+    {k:'feriasInicio',label:'Férias de',type:'date'},{k:'feriasFim',label:'Férias até',type:'date'},
+    {type:'note',html:'Durante as férias o motorista aparece como <b>De férias</b> e não pode ser atribuído a alugueres.'}
+  ],m,o=>save('motoristas',{...m,...o}),{done:m.id?'Motorista atualizado.':'Motorista adicionado.',
+   del:m.id&&!ativas?()=>remove('motoristas',m.id):null,validate:o=>feriasErro(m,o.feriasInicio,o.feriasFim)});
+}
+// Valida um período de férias contra os alugueres já atribuídos ao motorista.
+function feriasErro(m,a,b){
+  if(!a&&!b)return null; if(!a||!b)return 'Indique o início e o fim das férias.'; if(b<a)return 'O fim das férias tem de ser depois do início.';
+  const r=S.reservas.find(r=>m.id&&r.motoristaId===m.id&&['reservada','curso'].includes(r.estado)&&r.inicio<=b&&a<=r.fim);
+  return r?`Tem um aluguer atribuído de ${dd(r.inicio)} a ${dd(r.fim)} (${V(r.viaturaId)?.matricula||'—'}). Troque o motorista dessa reserva primeiro.`:null;
+}
+function formFerias(m){
+  openDrawer(`Férias · ${m.nome}`,[
+    {k:'feriasInicio',label:'Início',type:'date',req:1,def:TODAY},{k:'feriasFim',label:'Fim',type:'date',req:1},
+    {type:'note',html:'Fica registado um período de férias por motorista. Um novo período substitui o anterior.'}
+  ],m,o=>patch('motoristas',m.id,o),{ok:'Marcar férias',done:'Férias registadas.',validate:o=>feriasErro(m,o.feriasInicio,o.feriasFim)});
 }
 async function entregar(r){
   const v=V(r.viaturaId);
   if(v&&v.estado==='manutencao')return toast('A viatura está na oficina. Mude o estado antes de entregar.');
+  const mc=mConflito(r); if(mc)return toast(mc+' Edite a reserva antes de entregar.');
   await patch('reservas',r.id,{estado:'curso',kmSaida:v?.km||0});
   if(v) await patch('viaturas',v.id,{estado:'alugada'});
   toast('Viatura entregue ao cliente.');
@@ -289,6 +354,7 @@ async function faturar(r){
   const nums=S.faturas.map(f=>f.numero||'').filter(n=>n.includes(ano+'/')).map(n=>+n.split('/')[1]||0);
   const numero=`FT ${ano}/${pad((nums.length?Math.max(...nums):0)+1,4)}`;
   const linhas=[{desc:`Aluguer ${vLabel(v)} (${v?.matricula||''}), ${ddShort(r.inicio)} a ${ddShort(r.fim)}`,qtd:resDias(r),preco:+r.tarifa||0}];
+  const m=M(r.motoristaId); if(resMot(r)>0)linhas.push({desc:`Serviço de motorista${m?` (${m.nome})`:''}`,qtd:resDias(r),preco:resMot(r)});
   if(+r.extras>0)linhas.push({desc:r.extrasDesc||'Encargos adicionais',qtd:1,preco:+r.extras});
   const id=uid();
   await save('faturas',{id,numero,data:TODAY,clienteId:r.clienteId,reservaId:r.id,viaturaId:r.viaturaId,iva:IVA(),estado:'pendente',linhas});
@@ -342,11 +408,11 @@ function viewPainel(){
   </div>
   <div class="cols">
     <section class="panel"><div class="panel-h"><h2>Alertas</h2><span class="sub">${al.filter(a=>a.lvl==='crit').length} urgentes · ${al.filter(a=>a.lvl!=='crit').length} a acompanhar</span></div>
-      ${al.length?`<ul class="alerts">${al.map(a=>`<li class="${a.lvl}"><span class="sev"></span><div><div class="t">${esc(a.t)}</div><div class="m">${plate(a.v)} <span>${a.raw?a.m:esc(a.m)}</span></div></div><button class="btn sm" data-go="${a.go}">Abrir</button></li>`).join('')}</ul>`:'<div class="empty">Sem alertas. Documentos e manutenções em dia.</div>'}
+      ${al.length?`<ul class="alerts">${al.map(a=>`<li class="${a.lvl}"><span class="sev"></span><div><div class="t">${esc(a.t)}</div><div class="m">${a.who?`<b>${esc(a.who)}</b>`:plate(a.v)} <span>${a.raw?a.m:esc(a.m)}</span></div></div><button class="btn sm" data-go="${a.go}">Abrir</button></li>`).join('')}</ul>`:'<div class="empty">Sem alertas. Documentos e manutenções em dia.</div>'}
     </section>
     <div class="grid">
       <section class="panel"><div class="panel-h"><h2>Rent-a-Car em curso e próximos 7 dias</h2></div>
-        ${prox.length?`<ul class="alerts">${prox.map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;return `<li class="${late?'crit':r.estado==='curso'?'info':'warn'}"><span class="sev"></span><div><div class="t">${esc(c?.nome||'—')}</div><div class="m">${plate(v)} ${r.estado==='curso'?`devolve ${dd(r.fim)}`:`levanta ${dd(r.inicio)}`}</div></div>${r.estado==='curso'?`<button class="btn sm" data-dev="${r.id}">Devolver</button>`:`<button class="btn sm" data-ent="${r.id}">Entregar</button>`}</li>`}).join('')}</ul>`:'<div class="empty">Nada agendado.</div>'}
+        ${prox.length?`<ul class="alerts">${prox.map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;return `<li class="${late?'crit':r.estado==='curso'?'info':'warn'}"><span class="sev"></span><div><div class="t">${esc(c?.nome||'—')}</div><div class="m">${plate(v)} ${r.estado==='curso'?`devolve ${dd(r.fim)}`:`levanta ${dd(r.inicio)}`}${M(r.motoristaId)?` · motorista ${esc(M(r.motoristaId).nome)}`:''}</div></div>${r.estado==='curso'?`<button class="btn sm" data-dev="${r.id}">Devolver</button>`:`<button class="btn sm" data-ent="${r.id}">Entregar</button>`}</li>`}).join('')}</ul>`:'<div class="empty">Nada agendado.</div>'}
       </section>
       <section class="panel"><div class="panel-h"><h2>Estado da frota</h2><button class="link" data-go="viaturas">Ver todas</button></div>
         <div class="tbl-wrap"><table><tbody>${S.viaturas.map(v=>`<tr><td>${vCell(v)}</td><td class="n muted">${fmt(v.km)} km</td><td class="act">${pill(ESTADO_V[v.estado]||ESTADO_V.inativa)}</td></tr>`).join('')||'<tr><td class="empty">Sem viaturas.</td></tr>'}</tbody></table></div>
@@ -421,16 +487,98 @@ function viewReservas(){
     .sort((a,b)=>(a.estado==='concluida')-(b.estado==='concluida')||a.inicio.localeCompare(b.inicio));
   return `<div class="toolbar"><div class="seg" role="group" aria-label="Filtrar reservas">${[['ativas','Ativas'],['concluida','Concluídas'],['cancelada','Canceladas'],['todas','Todas']].map(([k,t])=>`<button data-rs="${k}" aria-pressed="${st===k}">${t}</button>`).join('')}</div><span class="grow"></span><button class="btn primary" data-new="reserva">+ Nova reserva</button></div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Cliente</th><th>Viatura</th><th>Período</th><th class="n">Dias</th><th class="n">Valor s/ IVA</th><th class="n">Km</th><th>Estado</th><th></th></tr></thead>
+    <thead><tr><th>Cliente</th><th>Viatura</th><th>Motorista</th><th>Período</th><th class="n">Dias</th><th class="n">Valor s/ IVA</th><th class="n">Km</th><th>Estado</th><th></th></tr></thead>
     <tbody>${list.map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;
       const f=r.faturaId&&S.faturas.find(x=>x.id===r.faturaId);
       let act='';
       if(r.estado==='reservada')act=`<button class="btn sm primary" data-ent="${r.id}">Entregar</button> <button class="btn sm ghost" data-edit="reservas:${r.id}">Editar</button> <button class="btn sm ghost danger" data-cancel="${r.id}">Cancelar</button>`;
       else if(r.estado==='curso')act=`<button class="btn sm primary" data-dev="${r.id}">Devolver</button>`;
       else if(r.estado==='concluida')act=f?`<button class="btn sm" data-fat="${f.id}">${esc(f.numero)}</button>`:`<button class="btn sm primary" data-faturar="${r.id}">Faturar</button>`;
-      return `<tr><td><b>${esc(c?.nome||'—')}</b><br><small class="muted">${esc(r.condutores||'')}</small></td><td>${plate(v)}</td><td class="nowrap">${dd(r.inicio)} → ${dd(r.fim)}</td><td class="n">${resDias(r)}</td><td class="n">${MT0(resValor(r)+(+r.extras||0))}</td>
+      return `<tr><td><b>${esc(c?.nome||'—')}</b><br><small class="muted">${esc(r.condutores||'')}</small></td><td>${plate(v)}</td><td>${mCell(r)}</td><td class="nowrap">${dd(r.inicio)} → ${dd(r.fim)}</td><td class="n">${resDias(r)}</td><td class="n">${MT0(resValor(r)+(+r.extras||0))}</td>
       <td class="n muted">${r.kmEntrada?fmt(r.kmEntrada-r.kmSaida):'—'}</td><td>${late?pill(['Atrasada','p-crit']):pill(ESTADO_R[r.estado]||ESTADO_R.reservada)}</td><td class="act">${act}</td></tr>`}).join('')}</tbody>
   </table></div>${list.length?'':'<div class="empty">Sem reservas neste filtro.</div>'}</section>`;
+}
+
+function mCell(r){
+  const m=M(r.motoristaId); if(!r.motoristaId)return '<span class="muted">Cliente conduz</span>';
+  return m?`<button class="link" data-mot="${m.id}">${esc(m.nome)}</button><br><small class="muted">${MT0(resMot(r))}/dia</small>`:'<span class="muted">Motorista removido</span>';
+}
+// Linha de contexto de um motorista: onde está agora ou o que vem a seguir.
+function mContexto(m,e=mEstado(m)){
+  if(e==='inativo')return 'Fora do quadro';
+  if(e==='ferias')return `Regressa a ${dd(addDays(m.feriasFim,1))}`;
+  const a=mAtual(m); if(a)return `${plate(V(a.viaturaId))} <span>${esc(C(a.clienteId)?.nome||'—')} · até ${dd(a.fim)}</span>`;
+  const p=mProx(m); if(p)return `Próximo: ${plate(V(p.viaturaId))} <span>${dd(p.inicio)} → ${dd(p.fim)}</span>`;
+  if(m.feriasInicio>TODAY)return `Férias marcadas a partir de ${dd(m.feriasInicio)}`;
+  return 'Sem serviço agendado';
+}
+function viewMotoristas(){
+  const sel=M(filters.mid); if(sel)return viewMotorista(sel);
+  const all=S.motoristas.map(m=>({m,e:mEstado(m)})).sort((a,b)=>a.m.nome.localeCompare(b.m.nome));
+  const by=k=>all.filter(x=>x.e===k);
+  const ativos=all.filter(x=>x.e==='disponivel'||x.e==='servico');
+  const q=(filters.mq||'').toLowerCase(), st=filters.ms||'todos';
+  const list=all.filter(x=>(st==='todos'||(st==='ativos'?['disponivel','servico'].includes(x.e):x.e===st))&&`${x.m.nome} ${x.m.telefone||''} ${x.m.carta||''}`.toLowerCase().includes(q));
+  const col=(k,lvl,t,vazio)=>{const xs=by(k);return `<section class="panel"><div class="panel-h"><h2>${t}</h2><span class="pill ${ESTADO_M[k][1]}">${xs.length}</span></div>
+    ${xs.length?`<ul class="alerts">${xs.map(({m})=>`<li class="${lvl}"><span class="sev"></span><div><div class="t">${esc(m.nome)}</div><div class="m">${mContexto(m,k)}</div></div><button class="btn sm" data-mot="${m.id}">Painel</button></li>`).join('')}</ul>`:`<div class="empty">${vazio}</div>`}</section>`};
+  const ferias30=all.filter(x=>x.e!=='inativo'&&x.m.feriasInicio>TODAY&&days(TODAY,x.m.feriasInicio)<=30).length;
+  return `<div class="kpis">
+    <div class="kpi"><label>Motoristas ativos</label><b>${ativos.length}</b><small>${by('disponivel').length} disponíveis · ${by('servico').length} em serviço</small>
+      <div class="fleetbar" aria-hidden="true"><span style="width:${by('disponivel').length/(all.length||1)*100}%;background:var(--ok)"></span><span style="width:${by('servico').length/(all.length||1)*100}%;background:var(--info)"></span><span style="width:${by('ferias').length/(all.length||1)*100}%;background:var(--amber)"></span></div></div>
+    <div class="kpi"><label>Disponíveis agora</label><b>${by('disponivel').length}</b><small>podem ser atribuídos a um aluguer</small></div>
+    <div class="kpi"><label>Em serviço</label><b>${by('servico').length}</b><small>com viatura entregue a cliente</small></div>
+    <div class="kpi"><label>De férias</label><b>${by('ferias').length}</b><small>${ferias30} com férias nos próximos 30 dias</small></div>
+  </div>
+  <div class="board">${col('disponivel','ok','Disponíveis','Nenhum motorista livre.')}${col('servico','info','Em serviço','Nenhum motorista em serviço.')}${col('ferias','warn','De férias','Ninguém de férias.')}</div>
+  <div class="toolbar"><input class="search" id="mq" type="search" placeholder="Procurar nome, telefone ou carta" value="${esc(filters.mq||'')}" aria-label="Procurar motoristas">
+    <div class="seg" role="group" aria-label="Filtrar por situação">${[['todos','Todos'],['ativos','Ativos'],...Object.entries(ESTADO_M).map(([k,[t]])=>[k,t])].map(([k,t])=>`<button data-ms="${k}" aria-pressed="${st===k}">${t}</button>`).join('')}</div>
+    <span class="grow"></span><button class="btn primary" data-new="motorista">+ Novo motorista</button></div>
+  <section class="panel"><div class="tbl-wrap"><table>
+    <thead><tr><th>Motorista</th><th>Carta de condução</th><th>Agora / a seguir</th><th>Férias</th><th class="n">Tarifa/dia</th><th>Situação</th><th></th></tr></thead>
+    <tbody>${list.map(({m,e})=>{const s=docState(m.cartaValidade);return `<tr><td><b>${esc(m.nome)}</b><br><small class="muted">${esc(m.telefone||'')}</small></td>
+      <td class="nowrap"><span class="mono">${esc(m.carta||'—')}</span> <small class="muted">${esc(m.cartaCategoria||'')}</small><br><span class="docdate ${s==='ok'?'':s||''}">válida até ${dd(m.cartaValidade)}</span></td>
+      <td><div class="m-ctx">${mContexto(m,e)}</div></td>
+      <td class="nowrap">${m.feriasInicio&&m.feriasFim>=TODAY?`${dd(m.feriasInicio)} → ${dd(m.feriasFim)}`:'<span class="muted">—</span>'}</td>
+      <td class="n">${MT0(m.tarifa)}</td><td>${pill(ESTADO_M[e])}</td>
+      <td class="act"><button class="btn sm" data-mot="${m.id}">Painel</button> <button class="btn sm ghost" data-edit="motoristas:${m.id}">Editar</button></td></tr>`}).join('')}</tbody>
+  </table></div>${list.length?'':`<div class="empty">${S.motoristas.length?'Nenhum motorista corresponde ao filtro.':'Ainda não há motoristas. Adicione o primeiro.'}</div>`}</section>`;
+}
+function viewMotorista(m){
+  const e=mEstado(m), s=docState(m.cartaValidade);
+  const rs=S.reservas.filter(r=>r.motoristaId===m.id);
+  const feitos=rs.filter(r=>r.estado==='concluida');
+  const agenda=rs.filter(r=>['curso','reservada'].includes(r.estado)).sort((a,b)=>(a.estado==='curso'?-1:0)-(b.estado==='curso'?-1:0)||a.inicio.localeCompare(b.inicio));
+  const hist=rs.filter(r=>['concluida','cancelada'].includes(r.estado)).sort((a,b)=>b.inicio.localeCompare(a.inicio));
+  const km=sum(feitos,r=>(+r.kmEntrada||0)-(+r.kmSaida||0));
+  const diasServ=sum(rs.filter(r=>['concluida','curso'].includes(r.estado)),resDias);
+  const rec=sum(feitos,r=>resDias(r)*resMot(r));
+  const feriasTxt=m.feriasInicio&&m.feriasFim>=TODAY?`${dd(m.feriasInicio)} → ${dd(m.feriasFim)}`:'Sem férias marcadas';
+  return `<div class="toolbar"><button class="btn" data-mot="">← Todos os motoristas</button><span class="grow"></span>
+    ${e==='inativo'?'':m.feriasInicio&&m.feriasFim>=TODAY?`<button class="btn" data-ferias-fim="${m.id}">Terminar férias</button>`:`<button class="btn" data-ferias="${m.id}">Marcar férias</button>`}
+    <button class="btn primary" data-edit="motoristas:${m.id}">Editar dados</button></div>
+  <div class="kpis">
+    <div class="kpi"><label>Situação</label><b style="font-size:21px">${pill(ESTADO_M[e])}</b><small>${e==='ferias'?`até ${dd(m.feriasFim)}`:e==='servico'?`devolve ${dd(mAtual(m).fim)}`:e==='disponivel'?'pode ser atribuído':'fora do quadro'}</small></div>
+    <div class="kpi"><label>Alugueres feitos</label><b>${feitos.length}</b><small>${agenda.length} ${agenda.length===1?'agendado ou em curso':'agendados ou em curso'}</small></div>
+    <div class="kpi"><label>Km conduzidos</label><b>${fmt(km)}</b><small>${fmt(diasServ)} dias em serviço</small></div>
+    <div class="kpi"><label>Faturado em motorista</label><b>${MT0(rec)}</b><small>sem IVA · alugueres concluídos</small></div>
+  </div>
+  <div class="cols">
+    <section class="panel"><div class="panel-h"><h2>Serviço atual e agendado</h2></div>
+      ${agenda.length?`<ul class="alerts">${agenda.map(r=>{const late=r.estado==='curso'&&r.fim<TODAY;return `<li class="${late?'crit':r.estado==='curso'?'info':'warn'}"><span class="sev"></span><div><div class="t">${esc(C(r.clienteId)?.nome||'—')}</div><div class="m">${plate(V(r.viaturaId))} <span>${dd(r.inicio)} → ${dd(r.fim)}${late?' · devolução em atraso':''}</span></div></div>${r.estado==='curso'?`<button class="btn sm" data-dev="${r.id}">Devolver</button>`:`<button class="btn sm" data-ent="${r.id}">Entregar</button>`}</li>`}).join('')}</ul>`:'<div class="empty">Sem alugueres atribuídos.</div>'}
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Dados do motorista</h2></div><div class="tbl-wrap"><table><tbody>
+      <tr><td class="muted">Telefone</td><td>${esc(m.telefone||'—')}</td></tr>
+      <tr><td class="muted">BI</td><td class="mono">${esc(m.documento||'—')}</td></tr>
+      <tr><td class="muted">Carta de condução</td><td><span class="mono">${esc(m.carta||'—')}</span> ${m.cartaCategoria?`· categorias ${esc(m.cartaCategoria)}`:''}</td></tr>
+      <tr><td class="muted">Carta válida até</td><td><span class="docdate ${s==='ok'?'':s||''}">${dd(m.cartaValidade)}</span>${s==='crit'?' · caducada':s==='warn'?' · a caducar':''}</td></tr>
+      <tr><td class="muted">Tarifa diária</td><td>${MT0(m.tarifa)}</td></tr>
+      <tr><td class="muted">Férias</td><td>${feriasTxt}</td></tr>
+    </tbody></table></div></section>
+  </div>
+  <section class="panel" style="margin-top:18px"><div class="panel-h"><h2>Histórico de alugueres</h2><span class="sub">${hist.length} registos</span></div><div class="tbl-wrap"><table>
+    <thead><tr><th>Período</th><th>Cliente</th><th>Viatura</th><th class="n">Dias</th><th class="n">Km</th><th class="n">Tarifa motorista</th><th>Estado</th></tr></thead>
+    <tbody>${hist.map(r=>`<tr><td class="nowrap">${dd(r.inicio)} → ${dd(r.fim)}</td><td>${esc(C(r.clienteId)?.nome||'—')}</td><td>${plate(V(r.viaturaId))}</td><td class="n">${resDias(r)}</td><td class="n">${r.kmEntrada?fmt(r.kmEntrada-r.kmSaida):'—'}</td><td class="n">${MT0(resMot(r))}/dia</td><td>${pill(ESTADO_R[r.estado])}</td></tr>`).join('')}</tbody>
+  </table></div>${hist.length?'':'<div class="empty">Ainda sem alugueres concluídos.</div>'}</section>`;
 }
 
 function viewClientes(){
@@ -500,15 +648,15 @@ function render(){
     return `${head}<button data-view="${k}"${view===k?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${v.i}</svg>${v.t}${k==='painel'&&crit?`<span class="count">${crit}</span>`:''}</button>`}).join('');
   $('#h1').textContent=VIEWS[view].t;
   const hoje=new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  $('#hsub').textContent=view==='painel'?`${S.config.nome||'A sua empresa'} · ${hoje}`:({viaturas:`${S.viaturas.length} viaturas registadas`,reservas:'Reservas, entregas e devoluções',clientes:`${S.clientes.length} clientes`,faturas:`Série FT ${TODAY.slice(0,4)} · IVA ${fmt(IVA())}%`,custos:'Abastecimentos, portagens, multas e outras despesas',manutencao:'Manutenção preventiva e histórico de oficina',relatorios:'Custo por quilómetro e rentabilidade por viatura',definicoes:'Emitente das faturas'})[view];
+  $('#hsub').textContent=view==='painel'?`${S.config.nome||'A sua empresa'} · ${hoje}`:({viaturas:`${S.viaturas.length} viaturas registadas`,motoristas:M(filters.mid)?`Painel do motorista · ${M(filters.mid).nome}`:'Disponibilidade, férias e serviço atual',reservas:'Reservas, entregas e devoluções',clientes:`${S.clientes.length} clientes`,faturas:`Série FT ${TODAY.slice(0,4)} · IVA ${fmt(IVA())}%`,custos:'Abastecimentos, portagens, multas e outras despesas',manutencao:'Manutenção preventiva e histórico de oficina',relatorios:'Custo por quilómetro e rentabilidade por viatura',definicoes:'Emitente das faturas'})[view];
   $('#topActions').innerHTML=`<span class="sync ${mode==='db'?'on':''}"><i></i>${mode==='db'?'Guardado na nuvem':mode==='loading'?'A ligar…':'Modo demonstração'}</span>`;
   $('#demoNote').innerHTML=mode==='demo'?'<div class="demo-note">Modo demonstração: os dados de exemplo e as suas alterações ficam só neste navegador.</div>':'';
-  const fn={painel:viewPainel,viaturas:viewViaturas,custos:viewCustos,manutencao:viewManutencao,reservas:viewReservas,clientes:viewClientes,faturas:viewFaturas,relatorios:viewRelatorios,definicoes:viewDefinicoes}[view];
+  const fn={painel:viewPainel,viaturas:viewViaturas,motoristas:viewMotoristas,custos:viewCustos,manutencao:viewManutencao,reservas:viewReservas,clientes:viewClientes,faturas:viewFaturas,relatorios:viewRelatorios,definicoes:viewDefinicoes}[view];
   const active=document.activeElement; const aid=active&&active.id; const pos=aid&&active.selectionStart;
   $('#view').innerHTML=fn();
-  if(aid&&(aid==='vq'||aid==='cq')){const el=document.getElementById(aid);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
+  if(aid&&['vq','cq','mq'].includes(aid)){const el=document.getElementById(aid);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
 }
-function go(k){ if(!VIEWS[k])return; view=k; try{history.replaceState(null,'','#'+k)}catch(e){} render(); window.scrollTo(0,0); }
+function go(k){ if(!VIEWS[k])return; view=k; filters.mid=null; try{history.replaceState(null,'','#'+k)}catch(e){} render(); window.scrollTo(0,0); }
 
 document.addEventListener('click',async e=>{
   const b=e.target.closest('button'); if(!b)return;
@@ -519,9 +667,15 @@ document.addEventListener('click',async e=>{
     if(d.vs){filters.vs=d.vs;return render()}
     if(d.rs){filters.rs=d.rs;return render()}
     if(d.ct){filters.ct=d.ct;return render()}
-    if(d.new)return ({viatura:()=>formViatura(),abast:()=>formAbast(),despesa:()=>formDespesa(),plano:()=>formPlano(),servico:()=>formServico(),cliente:()=>formCliente(),reserva:()=>formReserva()})[d.new]();
+    if(d.ms){filters.ms=d.ms;return render()}
+    if('mot' in d){view='motoristas';filters.mid=d.mot||null;try{history.replaceState(null,'','#motoristas')}catch(e){}render();return window.scrollTo(0,0)}
+    if(d.ferias){const m=M(d.ferias);return m&&formFerias(m)}
+    if(d.feriasFim){const m=M(d.feriasFim);if(!m)return;
+      // Férias já a decorrer terminam ontem; férias futuras são apagadas.
+      await patch('motoristas',m.id,m.feriasInicio<=TODAY?{feriasFim:addDays(TODAY,-1)}:{feriasInicio:'',feriasFim:''});return toast('Férias terminadas.')}
+    if(d.new)return ({viatura:()=>formViatura(),motorista:()=>formMotorista(),abast:()=>formAbast(),despesa:()=>formDespesa(),plano:()=>formPlano(),servico:()=>formServico(),cliente:()=>formCliente(),reserva:()=>formReserva()})[d.new]();
     if(d.edit){const[col,id]=d.edit.split(':');const o=S[col].find(x=>x.id===id);if(!o)return;
-      return ({viaturas:formViatura,abastecimentos:formAbast,despesas:formDespesa,planos:formPlano,servicos:formServico,clientes:formCliente,reservas:formReserva})[col](o);}
+      return ({viaturas:formViatura,motoristas:formMotorista,abastecimentos:formAbast,despesas:formDespesa,planos:formPlano,servicos:formServico,clientes:formCliente,reservas:formReserva})[col](o);}
     if(d.srv){const p=S.planos.find(x=>x.id===d.srv);return p&&formServico({},p)}
     if(d.ent){const r=S.reservas.find(x=>x.id===d.ent);return r&&entregar(r)}
     if(d.dev){const r=S.reservas.find(x=>x.id===d.dev);return r&&devolver(r)}
@@ -531,7 +685,7 @@ document.addEventListener('click',async e=>{
     if(b.id==='editEmp')return formEmpresa();
   }catch(err){}
 });
-document.addEventListener('input',e=>{ if(e.target.id==='vq'){filters.vq=e.target.value;render()} if(e.target.id==='cq'){filters.cq=e.target.value;render()} });
+document.addEventListener('input',e=>{ if(e.target.id==='vq'){filters.vq=e.target.value;render()} if(e.target.id==='cq'){filters.cq=e.target.value;render()} if(e.target.id==='mq'){filters.mq=e.target.value;render()} });
 document.addEventListener('change',e=>{ if(e.target.id==='cv'){filters.cv=e.target.value;render()} });
 
 const h=(location.hash||'').slice(1); if(VIEWS[h])view=h;

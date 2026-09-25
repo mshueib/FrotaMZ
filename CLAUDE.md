@@ -33,18 +33,23 @@ Para voltar aos dados de exemplo no browser: apagar `localStorage['frotamz-demo-
 
 1. **Camada de dados**: `S` (estado em memória, uma lista por coleção) + `save`, `patch`, `remove`, `saveConfig`.
    `mode` é `'db'` (artefacto) ou `'demo'` (localStorage). Qualquer backend novo deve implementar estas 4 funções.
-2. **Coleções**: `viaturas`, `abastecimentos`, `despesas`, `planos`, `servicos`, `clientes`, `reservas`, `faturas` + documento `config/empresa`.
-   Relações por id: `viaturaId`, `clienteId`, `reservaId`, `faturaId`.
+2. **Coleções**: `viaturas`, `motoristas`, `abastecimentos`, `despesas`, `planos`, `servicos`, `clientes`, `reservas`, `faturas` + documento `config/empresa`.
+   Relações por id: `viaturaId`, `clienteId`, `motoristaId`, `reservaId`, `faturaId`.
 3. **Regras de negócio**: `planStatus` (manutenção por km OU meses, o que chegar primeiro; aviso a 1500 km / 30 dias),
    `docState` (documentos caducados / a caducar em 30 dias), `vStats` (consumo L/100 km, custo/km, receita),
    `overlap` (conflito de reservas), `alerts` (lista do painel), `fatSub`/`fatIva`/`fatTot`.
-4. **Vistas**: `viewPainel`, `viewViaturas`, `viewReservas`, `viewClientes`, `viewFaturas`, `viewCustos`, `viewManutencao`, `viewRelatorios`, `viewDefinicoes` — devolvem HTML em string; `render()` redesenha tudo.
+   Motoristas: `mEstado` (calculado, nunca guardado: `inativo` → `ferias` se hoje ∈ `feriasInicio..feriasFim` → `servico` se tem aluguer `curso` → `disponivel`),
+   `mConflito` (inativo, de férias, já atribuído a outro aluguer no período, carta caduca antes da devolução), `feriasErro`.
+4. **Vistas**: `viewPainel`, `viewViaturas`, `viewMotoristas` (quadro Disponíveis / Em serviço / De férias + lista; com `filters.mid` mostra `viewMotorista`, o painel individual), `viewReservas`, `viewClientes`, `viewFaturas`, `viewCustos`, `viewManutencao`, `viewRelatorios`, `viewDefinicoes` — devolvem HTML em string; `render()` redesenha tudo.
 5. **Formulários**: `openDrawer(title, fields, init, onSubmit, opts)` gera o formulário a partir de uma lista de campos.
 6. **Eventos**: um único listener de `click` com `data-*` (`data-view`, `data-new`, `data-edit="colecao:id"`, `data-ent`, `data-dev`, `data-faturar`, `data-fat`…).
 
 ## Fluxo do aluguer
 
 `reservada` → **Entregar** (grava `kmSaida`, viatura `alugada`) → `curso` → **Devolver** (grava `kmEntrada`, extras; viatura `disponivel`, km atualizado) → `concluida` → **Faturar** (cria fatura `FT AAAA/NNNN`, liga `faturaId`) → fatura `pendente` → `paga`. Também `cancelada`.
+
+Aluguer com motorista: a reserva pode ter `motoristaId` + `tarifaMotorista` (MT/dia, por omissão a `tarifa` do motorista).
+`resValor` soma viatura + motorista; a fatura ganha a linha "Serviço de motorista". Sem motorista, o cliente conduz (`condutores`).
 
 ## Regras do domínio (Moçambique)
 

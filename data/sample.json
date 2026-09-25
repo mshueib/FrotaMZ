@@ -98,6 +98,67 @@
       "licenca": "2026-12-31"
     }
   ],
+  "motoristas": [
+    {
+      "id": "m1",
+      "nome": "Armando Sitoe",
+      "telefone": "+258 84 520 1133",
+      "documento": "110100456789B",
+      "carta": "MP-0045821",
+      "cartaCategoria": "B, C1",
+      "cartaValidade": "2029-03-14",
+      "tarifa": 1500,
+      "estado": "ativo"
+    },
+    {
+      "id": "m2",
+      "nome": "Celso Mabunda",
+      "telefone": "+258 82 771 4410",
+      "documento": "110203998812M",
+      "carta": "MC-0118340",
+      "cartaCategoria": "B, C, D",
+      "cartaValidade": "2028-07-02",
+      "tarifa": 1800,
+      "estado": "ativo"
+    },
+    {
+      "id": "m3",
+      "nome": "Fátima Nhaca",
+      "telefone": "+258 86 403 2291",
+      "documento": "100104556710F",
+      "carta": "MC-0093215",
+      "cartaCategoria": "B",
+      "cartaValidade": "2027-11-20",
+      "tarifa": 1500,
+      "estado": "ativo",
+      "feriasInicio": "2026-09-15",
+      "feriasFim": "2026-10-09"
+    },
+    {
+      "id": "m4",
+      "nome": "Ernesto Guambe",
+      "telefone": "+258 84 910 5507",
+      "documento": "110500112233C",
+      "carta": "GZ-0021478",
+      "cartaCategoria": "B, C1",
+      "cartaValidade": "2026-10-12",
+      "tarifa": 1500,
+      "estado": "ativo",
+      "feriasInicio": "2026-10-20",
+      "feriasFim": "2026-11-03"
+    },
+    {
+      "id": "m5",
+      "nome": "Luís Tembe",
+      "telefone": "+258 82 300 8812",
+      "documento": "110100778899T",
+      "carta": "MP-0070012",
+      "cartaCategoria": "B",
+      "cartaValidade": "2027-05-30",
+      "tarifa": 1400,
+      "estado": "inativo"
+    }
+  ],
   "abastecimentos": [
     {
       "id": "a01",
@@ -428,7 +489,9 @@
       "caucao": 10000,
       "estado": "curso",
       "kmSaida": 91180,
-      "condutores": "Helena Macuácua"
+      "condutores": "Helena Macuácua",
+      "motoristaId": "m1",
+      "tarifaMotorista": 1500
     },
     {
       "id": "r2",
@@ -451,7 +514,9 @@
       "tarifa": 4200,
       "caucao": 15000,
       "estado": "reservada",
-      "condutores": "Eng. Abel Cossa; Sr. Rui Mondlane"
+      "condutores": "Eng. Abel Cossa; Sr. Rui Mondlane",
+      "motoristaId": "m2",
+      "tarifaMotorista": 1800
     },
     {
       "id": "r4",
@@ -484,6 +549,23 @@
       "extrasDesc": "Limpeza extra",
       "faturaId": "f1",
       "condutores": "Sr. Jaime Chissano"
+    },
+    {
+      "id": "r6",
+      "clienteId": "c3",
+      "viaturaId": "v4",
+      "inicio": "2026-09-12",
+      "fim": "2026-09-16",
+      "tarifa": 4000,
+      "caucao": 15000,
+      "estado": "concluida",
+      "kmSaida": 31100,
+      "kmEntrada": 31640,
+      "extras": 0,
+      "extrasDesc": "",
+      "condutores": "",
+      "motoristaId": "m2",
+      "tarifaMotorista": 1800
     }
   ],
   "faturas": [
