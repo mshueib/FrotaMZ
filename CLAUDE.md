@@ -89,6 +89,10 @@ Na verificação o preço também é fixo (`precoReal = precoLitro`). Mudar o pr
 - Cores só via tokens CSS (`--accent`, `--crit`, `--warn`, `--ok`…); o tema escuro redefine os tokens.
 - Fontes: Barlow (UI), Barlow Semi Condensed (títulos), IBM Plex Mono (matrículas, NUIT, números de fatura).
 - Nada de `alert()/confirm()/prompt()` — confirmações são feitas na própria UI.
+- **Ecrãs limpos** (pedido do utilizador): no máximo 3–4 quadros de resumo e 5–6 colunas por tabela; não repetir o mesmo número
+  em quadros, colunas e listas. O detalhe vai para a ficha que abre ao clicar na linha (`tr[data-open]`) ou para a dica (`title`).
+  Na linha da tabela aparece só a **próxima ação** (Verificar, Pagar, Entregar…); editar/anular/apagar ficam na ficha.
+  Listas do Painel mostram 5 itens com "Ver mais". Período escolhe-se numa lista (`#per`), não em botões.
 
 ## Próximos passos (roadmap)
 

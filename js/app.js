@@ -25,9 +25,9 @@ const VIEWS={
   reservas:{t:'Reservas',g:'Rent-a-Car',i:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'},
   clientes:{t:'Clientes',g:'Rent-a-Car',i:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/>'},
   faturas:{t:'Faturação',g:'Rent-a-Car',i:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'},
-  custos:{t:'Combustível e custos',g:'Custos',i:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M6 9h6M14 11h2a2 2 0 0 1 2 2v4a1.5 1.5 0 0 0 3 0V8l-3-3"/>'},
-  requisicoes:{t:'Requisições de combustível',g:'Custos',i:'<path d="M8 3h8l3 3v15H5V3z"/><path d="M9 3v3h6M9 11h6M9 15h3"/><path d="M16.5 13.5s-1.8 2-1.8 3.2a1.8 1.8 0 0 0 3.6 0c0-1.2-1.8-3.2-1.8-3.2z"/>'},
-  postos:{t:'Bombas de combustível',g:'Custos',i:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M7 7h4v4H7z"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8.5L18 6"/>'},
+  custos:{t:'Combustível e custos',n:'Combustível',g:'Custos',i:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M6 9h6M14 11h2a2 2 0 0 1 2 2v4a1.5 1.5 0 0 0 3 0V8l-3-3"/>'},
+  requisicoes:{t:'Requisições de combustível',n:'Requisições',g:'Custos',i:'<path d="M8 3h8l3 3v15H5V3z"/><path d="M9 3v3h6M9 11h6M9 15h3"/><path d="M16.5 13.5s-1.8 2-1.8 3.2a1.8 1.8 0 0 0 3.6 0c0-1.2-1.8-3.2-1.8-3.2z"/>'},
+  postos:{t:'Bombas de combustível',n:'Bombas',g:'Custos',i:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M7 7h4v4H7z"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8.5L18 6"/>'},
   manutencao:{t:'Manutenção',g:'Custos',i:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>'},
   relatorios:{t:'Relatórios',g:'Análise',i:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'},
   definicoes:{t:'Empresa',g:'Análise',i:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.8 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.8-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.8H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.8-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.8 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.8H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'}
@@ -125,7 +125,7 @@ function periodo(){
 const inP=(d,P)=>!!d&&d>=P.de&&d<=P.ate;
 function perBar(){
   const p=filters.per||'mes';
-  return `<div class="seg" role="group" aria-label="Período">${PERIODOS.map(([k,t])=>`<button data-per="${k}" aria-pressed="${p===k}">${t}</button>`).join('')}</div>
+  return `<label class="per"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><select id="per" aria-label="Período">${PERIODOS.map(([k,t])=>`<option value="${k}"${p===k?' selected':''}>${t}</option>`).join('')}</select></label>
   ${p==='pers'?`<span class="dates"><input type="date" class="search" id="pDe" value="${esc(filters.pDe||'')}" aria-label="De"><span class="muted">a</span><input type="date" class="search" id="pAte" value="${esc(filters.pAte||'')}" aria-label="Até"></span>`:''}`;
 }
 
@@ -423,7 +423,7 @@ function verReq(r){
       ${row('Fatura nº',`<span class="mono">${esc(r.faturaNr)}</span>`)}${row('Recibo nº',`<span class="mono">${esc(r.reciboNr)}</span>`)}${row('Data',dd(r.dataPag))}
       ${row('Valor pago',`<b>${MT(r.valorPago)}</b>${Math.abs((+r.valorPago||0)-(+r.valorReal||0))>0.009?` <span class="pill p-warn">difere ${MT((+r.valorPago||0)-(+r.valorReal||0))}</span>`:''}`)}${row('Forma',esc(r.formaPag||'—'))}</tbody></table></div></section>`:''}
   </div>`;
-  $('#dFoot').innerHTML=`${r.estado==='pendente'?`<button type="button" class="btn primary" data-rqver="${r.id}">Verificar</button><button type="button" class="btn" data-edit="requisicoes:${r.id}">Editar</button>`:r.estado==='verificada'?`<button type="button" class="btn primary" data-rqpag="${r.id}">Registar pagamento</button>`:''}<span style="flex:1"></span><button type="button" class="btn" data-close>Fechar</button>`;
+  $('#dFoot').innerHTML=`${r.estado==='pendente'?`<button type="button" class="btn primary" data-rqver="${r.id}">Verificar</button><button type="button" class="btn" data-edit="requisicoes:${r.id}">Editar</button><button type="button" class="btn ghost danger" data-rqanular="${r.id}">Anular</button>`:r.estado==='verificada'?`<button type="button" class="btn primary" data-rqpag="${r.id}">Registar pagamento</button>`:''}<span style="flex:1"></span><button type="button" class="btn" data-close>Fechar</button>`;
   drawerSubmit=()=>closeDrawer(); $('#drawer').hidden=false;
 }
 
@@ -631,38 +631,41 @@ function viewPainel(){
   const pend=S.faturas.filter(f=>f.estado==='pendente');
   const al=alerts();
   const prox=S.reservas.filter(r=>(r.estado==='reservada'&&days(TODAY,r.inicio)<=7)||(r.estado==='curso')).sort((a,b)=>(a.estado==='curso'?a.fim:a.inicio).localeCompare(b.estado==='curso'?b.fim:b.inicio));
+  // Listas curtas: mostra os primeiros N e um botão para ver o resto.
+  const LIM=5, alAll=!!filters.alAll, prAll=!!filters.prAll;
+  const mais=(n,k,on)=>n>LIM?`<button class="more" data-more="${k}">${on?'Mostrar menos':`Ver mais ${n-LIM}`}</button>`:'';
+  const urg=al.filter(a=>a.lvl==='crit').length;
   return `<div class="kpis">
-    <div class="kpi"><label>Frota ativa</label><b>${vs.length}</b><small>${cnt('disponivel')} disponíveis · ${cnt('alugada')} alugadas · ${cnt('manutencao')} na oficina</small>
+    <div class="kpi"><label>Frota</label><b>${cnt('alugada')}<span class="of">/${vs.length}</span></b><small>alugadas hoje · ${cnt('disponivel')} livres</small>
       <div class="fleetbar" aria-hidden="true"><span style="width:${cnt('disponivel')/n*100}%;background:var(--ok)"></span><span style="width:${cnt('alugada')/n*100}%;background:var(--info)"></span><span style="width:${cnt('manutencao')/n*100}%;background:var(--amber)"></span></div></div>
-    <div class="kpi"><label>Taxa de ocupação hoje</label><b>${fmt(cnt('alugada')/n*100)}%</b><small>viaturas alugadas sobre a frota ativa</small></div>
-    <div class="kpi"><label>Faturado este mês</label><b>${MT0(recMes)}</b><small>sem IVA · ${pend.length} ${pend.length===1?'fatura':'faturas'} por receber (${MT0(sum(pend,fatTot))})</small></div>
-    <div class="kpi"><label>Custos este mês</label><b>${MT0(custoMes)}</b><small>combustível, despesas e oficina</small></div>
+    <div class="kpi"><label>Faturado este mês</label><b>${MT0(recMes)}</b><small>${pend.length?`${MT0(sum(pend,fatTot))} por receber`:'tudo recebido'}</small></div>
+    <div class="kpi"><label>Custos este mês</label><b>${MT0(custoMes)}</b><small>combustível, oficina e despesas</small></div>
   </div>
   <div class="cols">
-    <section class="panel"><div class="panel-h"><h2>Alertas</h2><span class="sub">${al.filter(a=>a.lvl==='crit').length} urgentes · ${al.filter(a=>a.lvl!=='crit').length} a acompanhar</span></div>
-      ${al.length?`<ul class="alerts">${al.map(a=>`<li class="${a.lvl}"><span class="sev"></span><div><div class="t">${esc(a.t)}</div><div class="m">${a.who?`<b>${esc(a.who)}</b>`:plate(a.v)} <span>${a.raw?a.m:esc(a.m)}</span></div></div><button class="btn sm" data-go="${a.go}"${a.ca?' data-ca="anormal"':''}>Abrir</button></li>`).join('')}</ul>`:'<div class="empty">Sem alertas. Documentos e manutenções em dia.</div>'}
+    <section class="panel"><div class="panel-h"><h2>Precisa de atenção</h2>${urg?`<span class="pill p-crit">${urg} ${urg===1?'urgente':'urgentes'}</span>`:''}</div>
+      ${al.length?`<ul class="alerts">${(alAll?al:al.slice(0,LIM)).map(a=>`<li class="${a.lvl}"><span class="sev"></span><div><div class="t">${esc(a.t)}</div><div class="m">${a.who?`<b>${esc(a.who)}</b>`:plate(a.v)} <span>${a.raw?a.m:esc(a.m)}</span></div></div><button class="btn sm ghost" data-go="${a.go}"${a.ca?' data-ca="anormal"':''} aria-label="Abrir">›</button></li>`).join('')}</ul>${mais(al.length,'al',alAll)}`:'<div class="empty">Tudo em dia.</div>'}
     </section>
-    <div class="grid">
-      <section class="panel"><div class="panel-h"><h2>Rent-a-Car em curso e próximos 7 dias</h2></div>
-        ${prox.length?`<ul class="alerts">${prox.map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;return `<li class="${late?'crit':r.estado==='curso'?'info':'warn'}"><span class="sev"></span><div><div class="t">${esc(c?.nome||'—')}</div><div class="m">${plate(v)} ${r.estado==='curso'?`devolve ${dd(r.fim)}`:`levanta ${dd(r.inicio)}`}${M(r.motoristaId)?` · motorista ${esc(M(r.motoristaId).nome)}`:''}</div></div>${r.estado==='curso'?`<button class="btn sm" data-dev="${r.id}">Devolver</button>`:`<button class="btn sm" data-ent="${r.id}">Entregar</button>`}</li>`}).join('')}</ul>`:'<div class="empty">Nada agendado.</div>'}
-      </section>
-      <section class="panel"><div class="panel-h"><h2>Estado da frota</h2><button class="link" data-go="viaturas">Ver todas</button></div>
-        <div class="tbl-wrap"><table><tbody>${S.viaturas.map(v=>`<tr><td>${vCell(v)}</td><td class="n muted">${fmt(v.km)} km</td><td class="act">${pill(ESTADO_V[v.estado]||ESTADO_V.inativa)}</td></tr>`).join('')||'<tr><td class="empty">Sem viaturas.</td></tr>'}</tbody></table></div>
-      </section>
-    </div>
+    <section class="panel"><div class="panel-h"><h2>Entregas e devoluções</h2><span class="sub">próximos 7 dias</span></div>
+      ${prox.length?`<ul class="alerts">${(prAll?prox:prox.slice(0,LIM)).map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;return `<li class="${late?'crit':r.estado==='curso'?'info':'warn'}"><span class="sev"></span><div><div class="t">${esc(c?.nome||'—')}</div><div class="m">${plate(v)} ${late?`atrasada desde ${dd(r.fim)}`:r.estado==='curso'?`devolve ${dd(r.fim)}`:`levanta ${dd(r.inicio)}`}</div></div>${r.estado==='curso'?`<button class="btn sm" data-dev="${r.id}">Devolver</button>`:`<button class="btn sm" data-ent="${r.id}">Entregar</button>`}</li>`}).join('')}</ul>${mais(prox.length,'pr',prAll)}`:'<div class="empty">Nada agendado.</div>'}
+    </section>
   </div>`;
 }
 
 function viewViaturas(){
   const q=(filters.vq||'').toLowerCase(), st=filters.vs||'todas';
   const list=S.viaturas.filter(v=>(st==='todas'||v.estado===st)&&(`${v.matricula} ${v.marca} ${v.modelo}`.toLowerCase().includes(q)));
-  const dc=(v,k)=>{const s=docState(v[k]);return `<span class="docdate ${s==='ok'?'':s||''}">${dd(v[k])}</span>`};
+  // Um só indicador para os 3 documentos; as datas ficam na dica e na ficha da viatura.
+  const docs=v=>{ const xs=DOCS.filter(([k])=>v[k]).map(([k,l])=>({l,s:docState(v[k]),d:v[k]}));
+    const tip=esc(xs.map(x=>`${x.l}: ${dd(x.d)}`).join(' · ')||'Sem datas registadas');
+    const bad=xs.filter(x=>x.s==='crit'), w=xs.filter(x=>x.s==='warn');
+    const p=!xs.length?['Sem datas','p-mute']:bad.length?[`${bad.map(x=>x.l.split(' ')[0]).join(', ')} caducado`,'p-crit']:w.length?[`${w.map(x=>x.l.split(' ')[0]).join(', ')} a caducar`,'p-warn']:['Em dia','p-ok'];
+    return `<span title="${tip}">${pill(p)}</span>`; };
   return `<div class="toolbar"><input class="search" id="vq" type="search" placeholder="Procurar matrícula ou modelo" value="${esc(filters.vq||'')}" aria-label="Procurar viaturas">
     <div class="seg" role="group" aria-label="Filtrar por estado">${[['todas','Todas'],...Object.entries(ESTADO_V).map(([k,[t]])=>[k,t])].map(([k,t])=>`<button data-vs="${k}" aria-pressed="${st===k}">${t}</button>`).join('')}</div>
     <span class="grow"></span><button class="btn primary" data-new="viatura">+ Nova viatura</button></div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Viatura</th><th>Categoria</th><th class="n">Km</th><th class="n">Tarifa/dia</th><th>Seguro</th><th>Inspeção</th><th>Imposto anual</th><th>Estado</th><th></th></tr></thead>
-    <tbody>${list.map(v=>`<tr class="row-link" data-open="edit:viaturas:${v.id}" tabindex="0" title="Editar viatura"><td>${vCell(v)}<small class="muted">${esc(v.ano||'')} · ${esc(v.combustivel||'')}</small></td><td>${esc(v.categoria||'')}</td><td class="n">${fmt(v.km)}</td><td class="n">${MT0(v.tarifa)}</td><td>${dc(v,'seguro')}</td><td>${dc(v,'inspecao')}</td><td>${dc(v,'licenca')}</td><td>${pill(ESTADO_V[v.estado]||ESTADO_V.inativa)}</td><td class="act"><button class="btn sm" data-edit="viaturas:${v.id}">Editar</button></td></tr>`).join('')}</tbody>
+    <thead><tr><th>Viatura</th><th class="n">Km</th><th class="n">Tarifa/dia</th><th>Documentos</th><th>Estado</th></tr></thead>
+    <tbody>${list.map(v=>`<tr class="row-link" data-open="edit:viaturas:${v.id}" tabindex="0" title="Abrir viatura"><td>${vCell(v)}</td><td class="n">${fmt(v.km)}</td><td class="n">${MT0(v.tarifa)}</td><td>${docs(v)}</td><td>${pill(ESTADO_V[v.estado]||ESTADO_V.inativa)}</td></tr>`).join('')}</tbody>
   </table></div>${list.length?'':'<div class="empty">Nenhuma viatura corresponde ao filtro.</div>'}</section>`;
 }
 
@@ -671,39 +674,36 @@ function viewCustos(){
   const inV=x=>(!vf||x.viaturaId===vf)&&inP(x.data,P);
   const abast=S.abastecimentos.filter(inV);
   const consCell=x=>x?`${fmt(x.cons,1)}${x.anormal?` <span class="pill p-crit" title="Referência ${fmt(x.ref,1)} L/100 km">+${fmt(x.desvio)}%</span>`:''}`:'<span class="muted">—</span>';
-  const refCell=v=>{const r=consRef(v);return r?`${fmt(r.val,1)}<br><small class="muted">${r.fonte}</small>`:'<span class="muted">—</span>'};
   let body;
   if(tab==='abast'){
     const list=abast.map(a=>({a,x:consDesvio(a)})).filter(({x})=>ca!=='anormal'||x?.anormal).sort((p,q)=>q.a.data.localeCompare(p.a.data)||q.a.km-p.a.km);
-    body=`<thead><tr><th>Data</th><th>Viatura</th><th class="n">Km</th><th class="n">Km percorridos</th><th class="n">Litros</th><th class="n">MT/L</th><th class="n">Total</th><th class="n">L/100 km</th><th>Posto</th><th></th></tr></thead><tbody>${list.map(({a,x})=>{const c=fillCons(a);
-      return `<tr${x?.anormal?` class="row-crit row-link" data-cons="${a.viaturaId}" title="Ver histórico desta viatura"`:''}><td class="nowrap">${dd(a.data)}</td><td>${plate(V(a.viaturaId))}</td><td class="n">${fmt(a.km)}</td><td class="n muted">${c?fmt(c.dist):'—'}</td><td class="n">${fmt(a.litros,1)}</td><td class="n">${fmt(a.precoLitro,2)}</td><td class="n">${MT(a.litros*a.precoLitro)}</td><td class="n">${consCell(x||(c&&{cons:c.cons}))}</td><td class="muted">${esc(a.posto||'')}${a.requisicaoId&&S.requisicoes.find(x=>x.id===a.requisicaoId)?`<br><button class="link mono" data-rqvi="${a.requisicaoId}">${esc(S.requisicoes.find(x=>x.id===a.requisicaoId).numero)}</button>`:''}</td><td class="act"><button class="btn sm" data-edit="abastecimentos:${a.id}">Editar</button></td></tr>`}).join('')}</tbody>`;
-    body+=list.length?'':`<tbody><tr><td colspan="10" class="empty">${ca==='anormal'?'Nenhum abastecimento com consumo anormal neste período.':'Sem abastecimentos neste período.'}</td></tr></tbody>`;
+    body=`<thead><tr><th>Data</th><th>Viatura</th><th>Posto</th><th class="n">Litros</th><th class="n">Total</th><th class="n">L/100 km</th></tr></thead><tbody>${list.map(({a,x})=>{const c=fillCons(a);
+      const rq=a.requisicaoId&&S.requisicoes.find(y=>y.id===a.requisicaoId);
+      return `<tr class="row-link${x?.anormal?' row-crit':''}" data-open="edit:abastecimentos:${a.id}" tabindex="0" title="Abrir abastecimento"><td class="nowrap">${dd(a.data)}</td><td>${plate(V(a.viaturaId))}</td><td>${esc(a.posto||'')}${rq?` <small class="muted mono">${esc(rq.numero)}</small>`:''}</td><td class="n">${fmt(a.litros,1)}</td><td class="n">${MT0(a.litros*a.precoLitro)}</td><td class="n">${consCell(x||(c&&{cons:c.cons}))}</td></tr>`}).join('')}</tbody>`;
+    body+=list.length?'':`<tbody><tr><td colspan="6" class="empty">${ca==='anormal'?'Nenhum consumo anormal neste período.':'Sem abastecimentos neste período.'}</td></tr></tbody>`;
   }else{
     const list=S.despesas.filter(inV).sort((a,b)=>b.data.localeCompare(a.data));
-    body=`<thead><tr><th>Data</th><th>Viatura</th><th>Categoria</th><th>Descrição</th><th class="n">Valor</th><th></th></tr></thead><tbody>${list.map(d=>`<tr><td class="nowrap">${dd(d.data)}</td><td>${plate(V(d.viaturaId))}</td><td>${esc(d.categoria)}</td><td class="muted">${esc(d.descricao||'')}</td><td class="n">${MT(d.valor)}</td><td class="act"><button class="btn sm" data-edit="despesas:${d.id}">Editar</button></td></tr>`).join('')}</tbody>`;
-    body+=list.length?'':'<tbody><tr><td colspan="6" class="empty">Sem despesas neste período.</td></tr></tbody>';
+    body=`<thead><tr><th>Data</th><th>Viatura</th><th>Categoria</th><th class="n">Valor</th></tr></thead><tbody>${list.map(d=>`<tr class="row-link" data-open="edit:despesas:${d.id}" tabindex="0" title="${esc(d.descricao||'Abrir despesa')}"><td class="nowrap">${dd(d.data)}</td><td>${plate(V(d.viaturaId))}</td><td>${esc(d.categoria)}${d.descricao?` <small class="muted">· ${esc(d.descricao)}</small>`:''}</td><td class="n">${MT(d.valor)}</td></tr>`).join('')}</tbody>`;
+    body+=list.length?'':'<tbody><tr><td colspan="4" class="empty">Sem despesas neste período.</td></tr></tbody>';
   }
   const fuelT=sum(abast,a=>a.litros*a.precoLitro), litros=sum(abast,a=>a.litros), despT=sum(S.despesas.filter(inV),d=>d.valor);
   const rows=S.viaturas.filter(v=>!vf||v.id===vf).map(v=>({v,s:vStats(v,P),r:consRef(v)})).filter(x=>x.s.n).sort((a,b)=>b.s.fuel-a.s.fuel);
   const kmT=sum(rows,x=>x.s.kmRun), consT=kmT?sum(rows,x=>x.s.cons*x.s.kmRun/100)/kmT*100:null;
   const anormT=sum(rows,x=>x.s.anormais);
-  const resumo=tab==='abast'&&rows.length?`<section class="panel" style="margin-bottom:18px"><div class="panel-h"><h2>Combustível por viatura</h2><span class="sub">${esc(P.label)} · tolerância +${fmt(TOL())}%</span></div><div class="tbl-wrap"><table>
-    <thead><tr><th>Viatura</th><th class="n">Abast.</th><th class="n">Litros</th><th class="n">Gasto</th><th class="n">% do total</th><th class="n">Km</th><th class="n">L/100 km</th><th class="n">Referência</th><th class="n">MT/km</th><th>Consumo</th><th></th></tr></thead>
+  const resumo=tab==='abast'&&rows.length&&!vf?`<section class="panel" style="margin-bottom:18px"><div class="panel-h"><h2>Por viatura</h2><span class="sub">clique para ver o histórico</span></div><div class="tbl-wrap"><table>
+    <thead><tr><th>Viatura</th><th class="n">Litros</th><th class="n">Gasto</th><th class="n">L/100 km</th><th>Consumo</th></tr></thead>
     <tbody>${rows.map(({v,s,r})=>{const dv=s.cons&&r?(s.cons/r.val-1)*100:null;
-      const st=dv==null?['Sem referência','p-mute']:dv>TOL()?[`+${fmt(dv)}% acima`,'p-crit']:dv>TOL()/2?[`+${fmt(dv)}%`,'p-warn']:[dv>0?`+${fmt(dv)}%`:`${fmt(dv)}%`,'p-ok'];
-      return `<tr class="row-link" data-cons="${v.id}" title="Ver histórico de abastecimentos"><td>${vCell(v)}</td><td class="n">${s.n}</td><td class="n">${fmt(s.litros,1)}</td><td class="n"><b>${MT0(s.fuel)}</b></td><td class="n muted">${fuelT?fmt(s.fuel/fuelT*100):0}%</td><td class="n">${s.kmRun?fmt(s.kmRun):'—'}</td><td class="n">${s.cons?fmt(s.cons,1):'—'}</td><td class="n">${refCell(v)}</td><td class="n">${s.kmRun?fmt(s.fuel/s.kmRun,2):'—'}</td><td>${pill(st)}${s.anormais?` <small class="muted">${s.anormais} abast.</small>`:''}</td><td class="act"><button class="btn sm" data-cons="${v.id}">Histórico</button></td></tr>`}).join('')}</tbody></table></div></section>`:'';
-  return `<div class="toolbar">${perBar()}</div>
-  <div class="kpis">
-    <div class="kpi"><label>Combustível</label><b>${MT0(fuelT)}</b><small>${fmt(litros)} litros · ${esc(P.label)}</small></div>
-    <div class="kpi"><label>Consumo médio</label><b>${consT?fmt(consT,1):'—'} <span style="font-size:15px">L/100 km</span></b><small>${fmt(kmT)} km ${vf?'desta viatura':'da frota'}</small></div>
-    <div class="kpi"><label>Consumo anormal</label><b style="color:${anormT?'var(--crit)':'inherit'}">${anormT}</b><small>${anormT===1?'abastecimento':'abastecimentos'} acima de +${fmt(TOL())}% da referência</small></div>
-    <div class="kpi"><label>Outras despesas</label><b>${MT0(despT)}</b><small>portagens, multas, pneus, acidentes…</small></div>
-  </div>
-  ${resumo}
-  <div class="toolbar"><div class="seg" role="group" aria-label="Tipo de registo"><button data-ct="abast" aria-pressed="${tab==='abast'}">Abastecimentos</button><button data-ct="desp" aria-pressed="${tab==='desp'}">Despesas</button></div>
-    <select class="search" id="cv" aria-label="Filtrar por viatura" style="width:auto"><option value="">Todas as viaturas</option>${vOptions(vf)}</select>
-    ${tab==='abast'?`<div class="seg" role="group" aria-label="Filtrar por consumo"><button data-ca="todos" aria-pressed="${ca!=='anormal'}">Todo o consumo</button><button data-ca="anormal" aria-pressed="${ca==='anormal'}">Só anormal</button></div>`:''}
+      const st=dv==null?['—','p-mute']:dv>TOL()?[`+${fmt(dv)}% acima`,'p-crit']:dv>TOL()/2?[`+${fmt(dv)}%`,'p-warn']:['Normal','p-ok'];
+      return `<tr class="row-link" data-cons="${v.id}" tabindex="0" title="Ver histórico · referência ${r?fmt(r.val,1)+' L/100 km':'—'}"><td>${vCell(v)}</td><td class="n">${fmt(s.litros,1)}</td><td class="n"><b>${MT0(s.fuel)}</b></td><td class="n">${s.cons?fmt(s.cons,1):'—'}</td><td>${pill(st)}</td></tr>`}).join('')}</tbody></table></div></section>`:'';
+  const kpis=tab==='abast'?`<div class="kpi"><label>Combustível</label><b>${MT0(fuelT)}</b><small>${fmt(litros)} litros</small></div>
+    <div class="kpi"><label>Consumo médio</label><b>${consT?fmt(consT,1):'—'}<span class="of"> L/100 km</span></b><small>${fmt(kmT)} km</small></div>
+    <button class="kpi kpi-btn${ca==='anormal'?' on':''}" data-ca="${ca==='anormal'?'todos':'anormal'}" aria-pressed="${ca==='anormal'}"><label>Consumo anormal</label><b style="color:${anormT?'var(--crit)':'inherit'}">${anormT}</b><small>${ca==='anormal'?'a mostrar só estes · clique para ver todos':anormT?'clique para ver':'nenhum'}</small></button>`
+    :`<div class="kpi"><label>Despesas</label><b>${MT0(despT)}</b><small>${S.despesas.filter(inV).length} registos</small></div>`;
+  return `<div class="toolbar"><div class="seg" role="group" aria-label="Tipo de registo"><button data-ct="abast" aria-pressed="${tab==='abast'}">Abastecimentos</button><button data-ct="desp" aria-pressed="${tab==='desp'}">Despesas</button></div>
+    ${perBar()}<select class="search" id="cv" aria-label="Filtrar por viatura" style="width:auto"><option value="">Todas as viaturas</option>${vOptions(vf)}</select>${vf&&tab==='abast'?`<button class="btn" data-cons="${vf}">Ver gráfico</button>`:''}
     <span class="grow"></span><button class="btn primary" data-new="${tab==='abast'?'abast':'despesa'}">+ ${tab==='abast'?'Abastecimento':'Despesa'}</button></div>
+  <div class="kpis">${kpis}</div>
+  ${resumo}
   <section class="panel"><div class="tbl-wrap"><table>${body}</table></div></section>`;
 }
 
@@ -715,28 +715,23 @@ function viewRequisicoes(){
   const by=k=>base.filter(r=>r.estado===k);
   // Pendentes de verificar/pagar contam sempre, independentemente do período.
   const pend=S.requisicoes.filter(r=>r.estado==='pendente'&&(!vf||r.viaturaId===vf)), porPag=S.requisicoes.filter(r=>r.estado==='verificada'&&(!vf||r.viaturaId===vf));
-  const ativas=base.filter(r=>r.estado!=='anulada');
-  const act=r=>r.estado==='pendente'?`<button class="btn sm primary" data-rqver="${r.id}">Verificar</button> <button class="btn sm ghost" data-edit="requisicoes:${r.id}">Editar</button> <button class="btn sm ghost danger" data-rqanular="${r.id}">Anular</button>`
-    :r.estado==='verificada'?`<button class="btn sm primary" data-rqpag="${r.id}">Pagar</button> <button class="btn sm ghost" data-rqvi="${r.id}">Ver</button>`:`<button class="btn sm" data-rqvi="${r.id}">Ver</button>`;
-  const litCell=r=>{ if(r.litrosReais==null)return `${fmt(r.litros,1)}<br><small class="muted">pedido</small>`; const d=r.litrosReais-r.litros;
-    return `${fmt(r.litrosReais,1)}<br><small class="${d>0?'docdate crit':'muted'}">${d?`${d>0?'+':''}${fmt(d,1)} vs pedido`:'= pedido'}</small>`};
-  return `<div class="toolbar">${perBar()}</div>
-  <div class="steps" role="group" aria-label="Fluxo da requisição">
-    <button class="step" data-new="requisicao"><span class="n">1</span><span class="st"><b>Emitir</b><small>Registar com o nº do livro de requisições</small></span><em>+ Nova</em></button>
-    <button class="step${st==='pendente'?' on':''}" data-rqs="${st==='pendente'?'todas':'pendente'}" aria-pressed="${st==='pendente'}"><span class="n">2</span><span class="st"><b>Verificar</b><small>Confirmar litros e km do talão · ${MT0(sum(pend,rqValor))}</small></span><em class="${pend.length?'warn':''}">${pend.length}</em></button>
-    <button class="step${st==='verificada'?' on':''}" data-rqs="${st==='verificada'?'todas':'verificada'}" aria-pressed="${st==='verificada'}"><span class="n">3</span><span class="st"><b>Pagar</b><small>Nº da fatura e do recibo · ${MT0(sum(porPag,rqValor))}</small></span><em class="${porPag.length?'info':''}">${porPag.length}</em></button>
-    <button class="step${st==='paga'?' on':''}" data-rqs="${st==='paga'?'todas':'paga'}" aria-pressed="${st==='paga'}"><span class="n">✓</span><span class="st"><b>Pagas</b><small>${MT0(sum(by('paga'),r=>r.valorPago))} · ${fmt(sum(ativas,r=>r.litrosReais??r.litros))} L no período</small></span><em class="ok">${by('paga').length}</em></button>
+  // Só a próxima ação aparece na linha; editar, anular e o detalhe estão na ficha (clique na linha).
+  const act=r=>r.estado==='pendente'?`<button class="btn sm primary" data-rqver="${r.id}">Verificar</button>`:r.estado==='verificada'?`<button class="btn sm primary" data-rqpag="${r.id}">Pagar</button>`:'';
+  const litCell=r=>{ if(r.litrosReais==null)return fmt(r.litros,1); const d=r.litrosReais-r.litros;
+    return `${fmt(r.litrosReais,1)}${d>0?` <span class="pill p-crit" title="Pedido: ${fmt(r.litros,1)} L">+${fmt(d,1)}</span>`:''}`};
+  return `<div class="steps" role="group" aria-label="Fluxo da requisição">
+    <button class="step" data-new="requisicao"><span class="n">1</span><span class="st"><b>Emitir</b><small>nova requisição</small></span><em>+ Nova</em></button>
+    <button class="step${st==='pendente'?' on':''}" data-rqs="${st==='pendente'?'todas':'pendente'}" aria-pressed="${st==='pendente'}"><span class="n">2</span><span class="st"><b>Verificar</b><small>confirmar o talão</small></span><em class="${pend.length?'warn':''}">${pend.length}</em></button>
+    <button class="step${st==='verificada'?' on':''}" data-rqs="${st==='verificada'?'todas':'verificada'}" aria-pressed="${st==='verificada'}"><span class="n">3</span><span class="st"><b>Pagar</b><small>${porPag.length?`${MT0(sum(porPag,rqValor))} em dívida`:'fatura e recibo'}</small></span><em class="${porPag.length?'info':''}">${porPag.length}</em></button>
+    <button class="step${st==='paga'?' on':''}" data-rqs="${st==='paga'?'todas':'paga'}" aria-pressed="${st==='paga'}"><span class="n">✓</span><span class="st"><b>Pagas</b><small>no período</small></span><em class="ok">${by('paga').length}</em></button>
   </div>
-  <div class="toolbar"><input class="search" id="rqq" type="search" placeholder="Nº, posto, fatura, recibo…" value="${esc(filters.rqq||'')}" aria-label="Procurar requisições">
-    <div class="seg" role="group" aria-label="Filtrar por estado">${[['todas','Todas'],...Object.entries(ESTADO_RQ).map(([k,[t]])=>[k,t])].map(([k,t])=>`<button data-rqs="${k}" aria-pressed="${st===k}">${t}${k!=='todas'&&k!=='anulada'&&by(k).length?` <span class="muted">${by(k).length}</span>`:''}</button>`).join('')}</div>
-    <select class="search" id="rqv" aria-label="Filtrar por viatura" style="width:auto"><option value="">Todas as viaturas</option>${vOptions(vf)}</select>
-    <span class="grow"></span><button class="btn primary" data-new="requisicao">+ Nova requisição</button></div>
+  <div class="toolbar">${perBar()}<input class="search" id="rqq" type="search" placeholder="Nº, posto, fatura, recibo…" value="${esc(filters.rqq||'')}" aria-label="Procurar requisições">
+    <select class="search" id="rqv" aria-label="Filtrar por viatura" style="width:auto"><option value="">Todas as viaturas</option>${vOptions(vf)}</select>${st!=='todas'?`<button class="btn ghost" data-rqs="todas">✕ ${esc(ESTADO_RQ[st][0])}</button>`:''}</div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Nº</th><th>Data</th><th>Viatura</th><th>Requisitante</th><th>Posto</th><th class="n">Litros</th><th class="n">Valor</th><th>Fatura</th><th>Recibo</th><th>Estado</th><th></th></tr></thead>
-    <tbody>${list.map(r=>`<tr class="row-link${r.estado==='anulada'?' muted':''}" data-open="rq:${r.id}" tabindex="0" title="Abrir requisição ${esc(r.numero)}"><td class="mono nowrap">${esc(r.numero)}</td><td class="nowrap">${dd(r.data)}</td><td>${plate(V(r.viaturaId))}</td><td>${esc(M(r.motoristaId)?.nome||'—')}</td><td>${esc(r.posto||'')}</td>
-      <td class="n">${litCell(r)}</td><td class="n">${r.estado==='paga'?`<b>${MT(r.valorPago)}</b>`:MT(rqValor(r))}${r.estado==='pendente'?'<br><small class="muted">estimado</small>':''}</td>
-      <td class="mono nowrap">${esc(r.faturaNr||'—')}</td><td class="mono nowrap">${r.reciboNr?`${esc(r.reciboNr)}<br><small class="muted">${dd(r.dataPag)}</small>`:'—'}</td>
-      <td>${pill(ESTADO_RQ[r.estado]||ESTADO_RQ.pendente)}</td><td class="act">${act(r)}</td></tr>`).join('')}</tbody>
+    <thead><tr><th>Nº</th><th>Data</th><th>Viatura</th><th>Posto</th><th class="n">Litros</th><th class="n">Valor</th><th>Estado</th><th></th></tr></thead>
+    <tbody>${list.map(r=>`<tr class="row-link${r.estado==='anulada'?' muted':''}" data-open="rq:${r.id}" tabindex="0" title="Abrir requisição ${esc(r.numero)}"><td class="mono nowrap">${esc(r.numero)}</td><td class="nowrap">${dd(r.data)}</td><td>${plate(V(r.viaturaId))}</td><td>${esc(r.posto||'')}</td>
+      <td class="n">${litCell(r)}</td><td class="n">${MT0(r.estado==='paga'?r.valorPago:rqValor(r))}</td>
+      <td>${pill(ESTADO_RQ[r.estado]||ESTADO_RQ.pendente)}${r.faturaNr?` <small class="muted mono">${esc(r.faturaNr)}</small>`:''}</td><td class="act">${act(r)}</td></tr>`).join('')}</tbody>
   </table></div>${list.length?'':`<div class="empty">${S.requisicoes.length?'Nenhuma requisição neste filtro ou período. Experimente o período <b>Tudo</b> ou limpe a pesquisa.':'Ainda não há requisições.<br><button class="btn primary" data-new="requisicao" style="margin-top:10px">+ Registar a primeira requisição</button>'}</div>`}</section>`;
 }
 
@@ -745,44 +740,31 @@ function viewPostos(){
   const ativos=list.filter(p=>p.estado!=='inativo');
   const faixa=k=>{const xs=ativos.map(p=>+p[k]).filter(x=>x>0);return xs.length?{min:Math.min(...xs),max:Math.max(...xs)}:null};
   const fd=faixa('precoDiesel'), fg=faixa('precoGasolina');
-  const fx=f=>f?(f.min===f.max?MT(f.min):`${fmt(f.min,2)} – ${fmt(f.max,2)} MT`):'—';
   const rq=p=>S.requisicoes.filter(r=>r.postoId===p.id&&r.estado!=='anulada');
-  const precoCell=(p,k,f)=>+p[k]>0?`${fmt(p[k],2)}${f&&f.min<f.max&&+p[k]===f.min&&p.estado!=='inativo'?' <span class="pill p-ok">mais barato</span>':''}`:'<span class="muted">—</span>';
-  const porPagT=sum(S.requisicoes.filter(r=>r.estado==='verificada'),rqValor);
-  return `<div class="kpis">
-    <div class="kpi"><label>Bombas ativas</label><b>${ativos.length}</b><small>${list.length-ativos.length} inativas</small></div>
-    <div class="kpi"><label>Diesel</label><b style="font-size:21px">${fx(fd)}</b><small>por litro nas bombas ativas</small></div>
-    <div class="kpi"><label>Gasolina</label><b style="font-size:21px">${fx(fg)}</b><small>por litro nas bombas ativas</small></div>
-    <div class="kpi"><label>Por pagar às bombas</label><b>${MT0(porPagT)}</b><small>requisições verificadas</small></div>
-  </div>
-  <div class="toolbar"><span class="muted">O preço por litro de cada bomba é usado automaticamente nas requisições de combustível.</span><span class="grow"></span><button class="btn primary" data-new="posto">+ Nova bomba</button></div>
+  const precoCell=(p,k,f)=>+p[k]>0?`${fmt(p[k],2)}${f&&f.min<f.max&&+p[k]===f.min&&p.estado!=='inativo'?' <span class="pill p-ok" title="Mais barato">↓</span>':''}`:'<span class="muted">—</span>';
+  return `<div class="toolbar"><span class="muted">Os preços por litro são usados automaticamente nas requisições.</span><span class="grow"></span><button class="btn primary" data-new="posto">+ Nova bomba</button></div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Bomba</th><th>Contacto</th><th class="n">Diesel MT/L</th><th class="n">Gasolina MT/L</th><th>Preço desde</th><th class="n">Requisições</th><th class="n">Por pagar</th><th class="n">Pago</th><th>Situação</th><th></th></tr></thead>
-    <tbody>${list.map(p=>{const rs=rq(p);return `<tr class="row-link${p.estado==='inativo'?' muted':''}" data-open="edit:postos:${p.id}" tabindex="0" title="Editar bomba e preços"><td><b>${esc(p.nome)}</b><br><small class="muted">${esc(p.localizacao||'')}</small></td>
-      <td class="nowrap">${esc(p.telefone||'—')}${p.nuit?`<br><small class="muted">NUIT <span class="mono">${esc(p.nuit)}</span></small>`:''}</td>
+    <thead><tr><th>Bomba</th><th class="n">Diesel MT/L</th><th class="n">Gasolina MT/L</th><th>Preço desde</th><th class="n">Por pagar</th></tr></thead>
+    <tbody>${list.map(p=>{const rs=rq(p), dv=sum(rs.filter(r=>r.estado==='verificada'),rqValor);return `<tr class="row-link${p.estado==='inativo'?' muted':''}" data-open="edit:postos:${p.id}" tabindex="0" title="Editar bomba e preços"><td><b>${esc(p.nome)}</b>${p.estado==='inativo'?' '+pill(['Inativa','p-mute']):''}<br><small class="muted">${esc(p.localizacao||'')}</small></td>
       <td class="n">${precoCell(p,'precoDiesel',fd)}</td><td class="n">${precoCell(p,'precoGasolina',fg)}</td>
-      <td class="nowrap">${dd(p.precoData)}${(p.historico||[]).length>1?`<br><small class="muted">${p.historico.length} alterações</small>`:''}</td>
-      <td class="n">${rs.length}</td><td class="n">${MT0(sum(rs.filter(r=>r.estado==='verificada'),rqValor))}</td><td class="n">${MT0(sum(rs.filter(r=>r.estado==='paga'),r=>r.valorPago))}</td>
-      <td>${pill(p.estado==='inativo'?['Inativa','p-mute']:['Ativa','p-ok'])}</td>
-      <td class="act"><button class="btn sm" data-edit="postos:${p.id}">Editar preços</button></td></tr>`}).join('')}</tbody>
-  </table></div>${list.length?'':'<div class="empty">Ainda não há bombas. Registe a primeira com o preço por litro.</div>'}</section>`;
+      <td class="nowrap">${dd(p.precoData)}</td><td class="n">${dv?MT0(dv):'<span class="muted">—</span>'}</td></tr>`}).join('')}</tbody>
+  </table></div>${list.length?'':'<div class="empty">Ainda não há bombas.<br><button class="btn primary" data-new="posto" style="margin-top:10px">+ Registar a primeira bomba</button></div>'}</section>`;
 }
 
 function viewManutencao(){
   const planos=S.planos.map(p=>({p,st:planStatus(p),v:V(p.viaturaId)})).sort((a,b)=>({crit:0,warn:1,ok:2}[a.st.lvl]-{crit:0,warn:1,ok:2}[b.st.lvl])||b.st.used-a.st.used);
   const hist=S.servicos.slice().sort((a,b)=>b.data.localeCompare(a.data));
-  return `<div class="toolbar"><span class="muted">Planos preventivos por quilómetros e por tempo. Registe o serviço para reiniciar a contagem.</span><span class="grow"></span><button class="btn" data-new="servico">Registar serviço</button><button class="btn primary" data-new="plano">+ Novo plano</button></div>
+  return `<div class="toolbar"><span class="grow"></span><button class="btn" data-new="servico">Registar serviço</button><button class="btn primary" data-new="plano">+ Novo plano</button></div>
   <section class="panel" style="margin-bottom:18px"><div class="panel-h"><h2>Planos preventivos</h2><span class="sub">${planos.filter(x=>x.st.lvl!=='ok').length} a precisar de atenção</span></div><div class="tbl-wrap"><table>
-    <thead><tr><th>Viatura</th><th>Serviço</th><th>Intervalo</th><th>Último</th><th style="min-width:130px">Uso do intervalo</th><th>Próximo</th><th>Estado</th><th></th></tr></thead>
-    <tbody>${planos.map(({p,st,v})=>`<tr><td>${plate(v)}</td><td><b>${esc(p.tipo)}</b></td><td class="muted nowrap">${p.intervaloKm?fmt(p.intervaloKm)+' km':''}${p.intervaloKm&&p.intervaloMeses?' / ':''}${p.intervaloMeses?p.intervaloMeses+' meses':''}</td>
-      <td class="nowrap">${fmt(p.ultimoKm)} km<br><small class="muted">${dd(p.ultimaData)}</small></td>
+    <thead><tr><th>Viatura</th><th>Serviço</th><th style="min-width:130px">Uso do intervalo</th><th>Próximo</th><th>Estado</th><th></th></tr></thead>
+    <tbody>${planos.map(({p,st,v})=>`<tr class="row-link" data-open="edit:planos:${p.id}" tabindex="0" title="A cada ${p.intervaloKm?fmt(p.intervaloKm)+' km':''}${p.intervaloKm&&p.intervaloMeses?' ou ':''}${p.intervaloMeses?p.intervaloMeses+' meses':''} · último a ${fmt(p.ultimoKm)} km (${dd(p.ultimaData)})"><td>${plate(v)}</td><td><b>${esc(p.tipo)}</b></td>
       <td><div class="meter ${st.lvl==='ok'?'':st.lvl}"><span style="width:${Math.round(st.used*100)}%"></span></div><small class="muted">${Math.round(st.used*100)}%</small></td>
       <td class="nowrap">${p.intervaloKm?fmt(st.nextKm)+' km':''}<br><small class="muted">${st.nextDate?dd(st.nextDate):''}</small></td>
       <td>${pill(st.lvl==='crit'?['Em atraso','p-crit']:st.lvl==='warn'?['Brevemente','p-warn']:['Em dia','p-ok'])}</td>
-      <td class="act"><button class="btn sm" data-srv="${p.id}">Feito</button> <button class="btn sm ghost" data-edit="planos:${p.id}">Editar</button></td></tr>`).join('')}</tbody></table></div>${planos.length?'':'<div class="empty">Sem planos. Crie um para receber alertas.</div>'}</section>
+      <td class="act"><button class="btn sm" data-srv="${p.id}">Feito</button></td></tr>`).join('')}</tbody></table></div>${planos.length?'':'<div class="empty">Sem planos. Crie um para receber alertas.</div>'}</section>
   <section class="panel"><div class="panel-h"><h2>Histórico de oficina</h2><span class="sub">${MT0(sum(hist,s=>s.custo))} no total</span></div><div class="tbl-wrap"><table>
-    <thead><tr><th>Data</th><th>Viatura</th><th>Serviço</th><th class="n">Km</th><th>Oficina</th><th class="n">Custo</th><th></th></tr></thead>
-    <tbody>${hist.map(s=>`<tr><td class="nowrap">${dd(s.data)}</td><td>${plate(V(s.viaturaId))}</td><td>${esc(s.tipo)}</td><td class="n">${fmt(s.km)}</td><td class="muted">${esc(s.oficina||'')}</td><td class="n">${MT(s.custo)}</td><td class="act"><button class="btn sm" data-edit="servicos:${s.id}">Editar</button></td></tr>`).join('')}</tbody></table></div>${hist.length?'':'<div class="empty">Sem serviços registados.</div>'}</section>`;
+    <thead><tr><th>Data</th><th>Viatura</th><th>Serviço</th><th class="n">Custo</th></tr></thead>
+    <tbody>${hist.map(s=>`<tr class="row-link" data-open="edit:servicos:${s.id}" tabindex="0" title="${fmt(s.km)} km"><td class="nowrap">${dd(s.data)}</td><td>${plate(V(s.viaturaId))}</td><td>${esc(s.tipo)}${s.oficina?` <small class="muted">· ${esc(s.oficina)}</small>`:''}</td><td class="n">${MT(s.custo)}</td></tr>`).join('')}</tbody></table></div>${hist.length?'':'<div class="empty">Sem serviços registados.</div>'}</section>`;
 }
 
 function viewReservas(){
@@ -791,22 +773,19 @@ function viewReservas(){
     .sort((a,b)=>(a.estado==='concluida')-(b.estado==='concluida')||a.inicio.localeCompare(b.inicio));
   return `<div class="toolbar"><div class="seg" role="group" aria-label="Filtrar reservas">${[['ativas','Ativas'],['concluida','Concluídas'],['cancelada','Canceladas'],['todas','Todas']].map(([k,t])=>`<button data-rs="${k}" aria-pressed="${st===k}">${t}</button>`).join('')}</div><span class="grow"></span><button class="btn primary" data-new="reserva">+ Nova reserva</button></div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Cliente</th><th>Viatura</th><th>Motorista</th><th>Período</th><th class="n">Dias</th><th class="n">Valor s/ IVA</th><th class="n">Km</th><th>Estado</th><th></th></tr></thead>
+    <thead><tr><th>Cliente</th><th>Viatura</th><th>Período</th><th class="n">Valor s/ IVA</th><th>Estado</th><th></th></tr></thead>
     <tbody>${list.map(r=>{const c=C(r.clienteId),v=V(r.viaturaId);const late=r.estado==='curso'&&r.fim<TODAY;
       const f=r.faturaId&&S.faturas.find(x=>x.id===r.faturaId);
       let act='';
-      if(r.estado==='reservada')act=`<button class="btn sm primary" data-ent="${r.id}">Entregar</button> <button class="btn sm ghost" data-edit="reservas:${r.id}">Editar</button> <button class="btn sm ghost danger" data-cancel="${r.id}">Cancelar</button>`;
+      if(r.estado==='reservada')act=`<button class="btn sm primary" data-ent="${r.id}">Entregar</button> <button class="btn sm ghost danger" data-cancel="${r.id}">Cancelar</button>`;
       else if(r.estado==='curso')act=`<button class="btn sm primary" data-dev="${r.id}">Devolver</button>`;
       else if(r.estado==='concluida')act=f?`<button class="btn sm" data-fat="${f.id}">${esc(f.numero)}</button>`:`<button class="btn sm primary" data-faturar="${r.id}">Faturar</button>`;
-      return `<tr><td><b>${esc(c?.nome||'—')}</b><br><small class="muted">${esc(r.condutores||'')}</small></td><td>${plate(v)}</td><td>${mCell(r)}</td><td class="nowrap">${dd(r.inicio)} → ${dd(r.fim)}</td><td class="n">${resDias(r)}</td><td class="n">${MT0(resValor(r)+(+r.extras||0))}</td>
-      <td class="n muted">${r.kmEntrada?fmt(r.kmEntrada-r.kmSaida):'—'}</td><td>${late?pill(['Atrasada','p-crit']):pill(ESTADO_R[r.estado]||ESTADO_R.reservada)}</td><td class="act">${act}</td></tr>`}).join('')}</tbody>
+      const mo=M(r.motoristaId);
+      return `<tr${r.estado==='reservada'?` class="row-link" data-open="edit:reservas:${r.id}" tabindex="0" title="Editar reserva"`:''}><td><b>${esc(c?.nome||'—')}</b></td><td>${plate(v)}${mo?`<br><small class="muted">com ${esc(mo.nome)}</small>`:''}</td><td class="nowrap">${dd(r.inicio)} → ${dd(r.fim)}<br><small class="muted">${resDias(r)} ${resDias(r)===1?'dia':'dias'}</small></td><td class="n">${MT0(resValor(r)+(+r.extras||0))}</td>
+      <td>${late?pill(['Atrasada','p-crit']):pill(ESTADO_R[r.estado]||ESTADO_R.reservada)}</td><td class="act">${act}</td></tr>`}).join('')}</tbody>
   </table></div>${list.length?'':'<div class="empty">Sem reservas neste filtro.</div>'}</section>`;
 }
 
-function mCell(r){
-  const m=M(r.motoristaId); if(!r.motoristaId)return '<span class="muted">Cliente conduz</span>';
-  return m?`<button class="link" data-mot="${m.id}">${esc(m.nome)}</button><br><small class="muted">${MT0(resMot(r))}/dia</small>`:'<span class="muted">Motorista removido</span>';
-}
 // Linha de contexto de um motorista: onde está agora ou o que vem a seguir.
 function mContexto(m,e=mEstado(m)){
   if(e==='inativo')return 'Fora do quadro';
@@ -820,31 +799,19 @@ function viewMotoristas(){
   const sel=M(filters.mid); if(sel)return viewMotorista(sel);
   const all=S.motoristas.map(m=>({m,e:mEstado(m)})).sort((a,b)=>a.m.nome.localeCompare(b.m.nome));
   const by=k=>all.filter(x=>x.e===k);
-  const ativos=all.filter(x=>x.e==='disponivel'||x.e==='servico');
   const q=(filters.mq||'').toLowerCase(), st=filters.ms||'todos';
   const list=all.filter(x=>(st==='todos'||(st==='ativos'?['disponivel','servico'].includes(x.e):x.e===st))&&`${x.m.nome} ${x.m.telefone||''} ${x.m.carta||''}`.toLowerCase().includes(q));
   const col=(k,lvl,t,vazio)=>{const xs=by(k);return `<section class="panel"><div class="panel-h"><h2>${t}</h2><span class="pill ${ESTADO_M[k][1]}">${xs.length}</span></div>
-    ${xs.length?`<ul class="alerts">${xs.map(({m})=>`<li class="${lvl}"><span class="sev"></span><div><div class="t">${esc(m.nome)}</div><div class="m">${mContexto(m,k)}</div></div><button class="btn sm" data-mot="${m.id}">Painel</button></li>`).join('')}</ul>`:`<div class="empty">${vazio}</div>`}</section>`};
-  const ferias30=all.filter(x=>x.e!=='inativo'&&x.m.feriasInicio>TODAY&&days(TODAY,x.m.feriasInicio)<=30).length;
-  return `<div class="kpis">
-    <div class="kpi"><label>Motoristas ativos</label><b>${ativos.length}</b><small>${by('disponivel').length} disponíveis · ${by('servico').length} em serviço</small>
-      <div class="fleetbar" aria-hidden="true"><span style="width:${by('disponivel').length/(all.length||1)*100}%;background:var(--ok)"></span><span style="width:${by('servico').length/(all.length||1)*100}%;background:var(--info)"></span><span style="width:${by('ferias').length/(all.length||1)*100}%;background:var(--amber)"></span></div></div>
-    <div class="kpi"><label>Disponíveis agora</label><b>${by('disponivel').length}</b><small>podem ser atribuídos a um aluguer</small></div>
-    <div class="kpi"><label>Em serviço</label><b>${by('servico').length}</b><small>com viatura entregue a cliente</small></div>
-    <div class="kpi"><label>De férias</label><b>${by('ferias').length}</b><small>${ferias30} com férias nos próximos 30 dias</small></div>
-  </div>
-  <div class="board">${col('disponivel','ok','Disponíveis','Nenhum motorista livre.')}${col('servico','info','Em serviço','Nenhum motorista em serviço.')}${col('ferias','warn','De férias','Ninguém de férias.')}</div>
+    ${xs.length?`<ul class="alerts">${xs.map(({m})=>`<li class="${lvl}"><span class="sev"></span><div><div class="t">${esc(m.nome)}</div><div class="m">${mContexto(m,k)}</div></div><button class="btn sm ghost" data-mot="${m.id}" aria-label="Abrir painel de ${esc(m.nome)}">›</button></li>`).join('')}</ul>`:`<div class="empty">${vazio}</div>`}</section>`};
+  return `<div class="board">${col('disponivel','ok','Disponíveis','Nenhum motorista livre.')}${col('servico','info','Em serviço','Nenhum motorista em serviço.')}${col('ferias','warn','De férias','Ninguém de férias.')}</div>
   <div class="toolbar"><input class="search" id="mq" type="search" placeholder="Procurar nome, telefone ou carta" value="${esc(filters.mq||'')}" aria-label="Procurar motoristas">
     <div class="seg" role="group" aria-label="Filtrar por situação">${[['todos','Todos'],['ativos','Ativos'],...Object.entries(ESTADO_M).map(([k,[t]])=>[k,t])].map(([k,t])=>`<button data-ms="${k}" aria-pressed="${st===k}">${t}</button>`).join('')}</div>
     <span class="grow"></span><button class="btn primary" data-new="motorista">+ Novo motorista</button></div>
   <section class="panel"><div class="tbl-wrap"><table>
-    <thead><tr><th>Motorista</th><th>Carta de condução</th><th>Agora / a seguir</th><th>Férias</th><th class="n">Tarifa/dia</th><th>Situação</th><th></th></tr></thead>
+    <thead><tr><th>Motorista</th><th>Agora / a seguir</th><th>Carta válida até</th><th>Situação</th></tr></thead>
     <tbody>${list.map(({m,e})=>{const s=docState(m.cartaValidade);return `<tr class="row-link" data-open="mot:${m.id}" tabindex="0" title="Abrir painel do motorista"><td><b>${esc(m.nome)}</b><br><small class="muted">${esc(m.telefone||'')}</small></td>
-      <td class="nowrap"><span class="mono">${esc(m.carta||'—')}</span> <small class="muted">${esc(m.cartaCategoria||'')}</small><br><span class="docdate ${s==='ok'?'':s||''}">válida até ${dd(m.cartaValidade)}</span></td>
       <td><div class="m-ctx">${mContexto(m,e)}</div></td>
-      <td class="nowrap">${m.feriasInicio&&m.feriasFim>=TODAY?`${dd(m.feriasInicio)} → ${dd(m.feriasFim)}`:'<span class="muted">—</span>'}</td>
-      <td class="n">${MT0(m.tarifa)}</td><td>${pill(ESTADO_M[e])}</td>
-      <td class="act"><button class="btn sm" data-mot="${m.id}">Painel</button> <button class="btn sm ghost" data-edit="motoristas:${m.id}">Editar</button></td></tr>`}).join('')}</tbody>
+      <td class="nowrap"><span class="docdate ${s==='ok'?'':s||''}">${dd(m.cartaValidade)}</span></td><td>${pill(ESTADO_M[e])}</td></tr>`}).join('')}</tbody>
   </table></div>${list.length?'':`<div class="empty">${S.motoristas.length?'Nenhum motorista corresponde ao filtro.':'Ainda não há motoristas. Adicione o primeiro.'}</div>`}</section>`;
 }
 function viewMotorista(m){
@@ -889,10 +856,10 @@ function viewClientes(){
   const q=(filters.cq||'').toLowerCase();
   const list=S.clientes.filter(c=>`${c.nome} ${c.nuit}`.toLowerCase().includes(q)).sort((a,b)=>a.nome.localeCompare(b.nome));
   return `<div class="toolbar"><input class="search" id="cq" type="search" placeholder="Procurar nome ou NUIT" value="${esc(filters.cq||'')}" aria-label="Procurar clientes"><span class="grow"></span><button class="btn primary" data-new="cliente">+ Novo cliente</button></div>
-  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>NUIT</th><th>Identificação</th><th>Telefone</th><th>Carta de condução</th><th class="n">Alugueres</th><th class="n">Faturado</th><th></th></tr></thead>
-  <tbody>${list.map(c=>{const s=docState(c.cartaValidade);return `<tr class="row-link" data-open="edit:clientes:${c.id}" tabindex="0" title="Editar cliente"><td><b>${esc(c.nome)}</b></td><td style="font-family:var(--f-mono);font-size:13px">${esc(c.nuit||'—')}</td><td class="muted">${esc(c.documento||'')}</td><td class="nowrap">${esc(c.telefone||'')}</td>
-    <td>${c.carta?`${esc(c.carta)}<br><span class="docdate ${s==='ok'?'':s}">válida até ${dd(c.cartaValidade)}</span>`:'<span class="muted">Empresa</span>'}</td>
-    <td class="n">${S.reservas.filter(r=>r.clienteId===c.id).length}</td><td class="n">${MT0(sum(S.faturas.filter(f=>f.clienteId===c.id),fatTot))}</td><td class="act"><button class="btn sm" data-edit="clientes:${c.id}">Editar</button></td></tr>`}).join('')}</tbody></table></div>${list.length?'':'<div class="empty">Sem clientes.</div>'}</section>`;
+  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>NUIT</th><th>Carta válida até</th><th class="n">Alugueres</th><th class="n">Faturado</th></tr></thead>
+  <tbody>${list.map(c=>{const s=docState(c.cartaValidade);return `<tr class="row-link" data-open="edit:clientes:${c.id}" tabindex="0" title="Editar cliente"><td><b>${esc(c.nome)}</b><br><small class="muted">${esc(c.telefone||'')}</small></td><td class="mono">${esc(c.nuit||'—')}</td>
+    <td>${c.carta?`<span class="docdate ${s==='ok'?'':s}">${dd(c.cartaValidade)}</span>`:'<span class="muted">Empresa</span>'}</td>
+    <td class="n">${S.reservas.filter(r=>r.clienteId===c.id).length}</td><td class="n">${MT0(sum(S.faturas.filter(f=>f.clienteId===c.id),fatTot))}</td></tr>`}).join('')}</tbody></table></div>${list.length?'':'<div class="empty">Sem clientes.</div>'}</section>`;
 }
 
 function viewFaturas(){
@@ -900,13 +867,12 @@ function viewFaturas(){
   const pend=list.filter(f=>f.estado==='pendente');
   const porFaturar=S.reservas.filter(r=>r.estado==='concluida'&&!r.faturaId);
   return `<div class="kpis">
-    <div class="kpi"><label>Total faturado</label><b>${MT0(sum(list,fatTot))}</b><small>com IVA · ${list.length} faturas</small></div>
     <div class="kpi"><label>Por receber</label><b>${MT0(sum(pend,fatTot))}</b><small>${pend.length} ${pend.length===1?'fatura pendente':'faturas pendentes'}</small></div>
-    <div class="kpi"><label>IVA liquidado</label><b>${MT0(sum(list,fatIva))}</b><small>a declarar à AT</small></div>
+    <div class="kpi"><label>Total faturado</label><b>${MT0(sum(list,fatTot))}</b><small>com IVA · dos quais ${MT0(sum(list,fatIva))} de IVA</small></div>
   </div>
   ${porFaturar.length?`<section class="panel" style="margin-bottom:18px"><div class="panel-h"><h2>Alugueres por faturar</h2></div><ul class="alerts">${porFaturar.map(r=>`<li class="warn"><span class="sev"></span><div><div class="t">${esc(C(r.clienteId)?.nome||'—')}</div><div class="m">${plate(V(r.viaturaId))} ${dd(r.inicio)} → ${dd(r.fim)} · ${MT0(resValor(r)+(+r.extras||0))} s/ IVA</div></div><button class="btn sm primary" data-faturar="${r.id}">Emitir fatura</button></li>`).join('')}</ul></section>`:''}
-  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Número</th><th>Data</th><th>Cliente</th><th>Viatura</th><th class="n">Subtotal</th><th class="n">IVA</th><th class="n">Total</th><th>Estado</th><th></th></tr></thead>
-  <tbody>${list.map(f=>`<tr><td style="font-family:var(--f-mono);font-size:13px" class="nowrap">${esc(f.numero)}</td><td class="nowrap">${dd(f.data)}</td><td>${esc(C(f.clienteId)?.nome||'—')}</td><td>${plate(V(f.viaturaId))}</td><td class="n">${MT(fatSub(f))}</td><td class="n">${MT(fatIva(f))}</td><td class="n"><b>${MT(fatTot(f))}</b></td><td>${pill(f.estado==='paga'?['Paga','p-ok']:['Pendente','p-warn'])}</td><td class="act"><button class="btn sm" data-fat="${f.id}">Ver</button></td></tr>`).join('')}</tbody></table></div>${list.length?'':'<div class="empty">Ainda não há faturas. Conclua um aluguer para faturar.</div>'}</section>`;
+  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Número</th><th>Data</th><th>Cliente</th><th class="n">Total c/ IVA</th><th>Estado</th></tr></thead>
+  <tbody>${list.map(f=>`<tr class="row-link" data-open="fat:${f.id}" tabindex="0" title="Ver fatura"><td class="mono nowrap">${esc(f.numero)}</td><td class="nowrap">${dd(f.data)}</td><td>${esc(C(f.clienteId)?.nome||'—')}</td><td class="n"><b>${MT(fatTot(f))}</b></td><td>${pill(f.estado==='paga'?['Paga','p-ok']:['Pendente','p-warn'])}</td></tr>`).join('')}</tbody></table></div>${list.length?'':'<div class="empty">Ainda não há faturas. Conclua um aluguer para faturar.</div>'}</section>`;
 }
 
 function viewRelatorios(){
@@ -929,8 +895,8 @@ function viewRelatorios(){
       <div class="bar-track" style="height:8px" title="Receita ${MT0(s.receita)}"><span style="width:${s.receita/maxT*100}%;background:var(--info)"></span></div></div>
       <div class="n" style="text-align:right;font-variant-numeric:tabular-nums;font-size:12.5px">${MT0(s.total)}<br><span style="color:var(--info)">${MT0(s.receita)}</span></div></div>`).join('')}</div>
   </div></section>
-  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Viatura</th><th class="n">Km percorridos</th><th class="n">L/100 km</th><th class="n">Combustível</th><th class="n">Oficina</th><th class="n">Despesas</th><th class="n">Custo total</th><th class="n">MT/km</th><th class="n">Receita</th><th class="n">Margem</th></tr></thead>
-  <tbody>${rows.map(({v,s})=>`<tr><td>${vCell(v)}</td><td class="n">${fmt(s.kmRun)}</td><td class="n">${s.cons?fmt(s.cons,1):'—'}</td><td class="n">${MT0(s.fuel)}</td><td class="n">${MT0(s.serv)}</td><td class="n">${MT0(s.desp)}</td><td class="n"><b>${MT0(s.total)}</b></td><td class="n">${s.cpk?fmt(s.cpk,2):'—'}</td><td class="n">${MT0(s.receita)}</td><td class="n" style="color:${s.receita-s.total>=0?'var(--ok)':'var(--crit)'}">${MT0(s.receita-s.total)}</td></tr>`).join('')}</tbody></table></div></section>`;
+  <section class="panel"><div class="tbl-wrap"><table><thead><tr><th>Viatura</th><th class="n">Km</th><th class="n">Custo total</th><th class="n">MT/km</th><th class="n">Receita</th><th class="n">Margem</th></tr></thead>
+  <tbody>${rows.map(({v,s})=>`<tr title="Combustível ${MT0(s.fuel)} · Oficina ${MT0(s.serv)} · Despesas ${MT0(s.desp)}${s.cons?` · ${fmt(s.cons,1)} L/100 km`:''}"><td>${vCell(v)}</td><td class="n">${fmt(s.kmRun)}</td><td class="n"><b>${MT0(s.total)}</b></td><td class="n">${s.cpk?fmt(s.cpk,2):'—'}</td><td class="n">${MT0(s.receita)}</td><td class="n" style="color:${s.receita-s.total>=0?'var(--ok)':'var(--crit)'}">${MT0(s.receita-s.total)}</td></tr>`).join('')}</tbody></table></div></section>`;
 }
 
 function viewDefinicoes(){
@@ -955,12 +921,12 @@ function render(){
   const nRes=S.reservas.filter(r=>r.estado==='curso'&&r.fim<TODAY).length;
   const badge=k=>k==='painel'&&crit?`<span class="count" title="Alertas urgentes">${crit}</span>`:k==='requisicoes'&&nPend+nPag?`<span class="count warn" title="${nPend} por verificar · ${nPag} por pagar">${nPend+nPag}</span>`:k==='reservas'&&nRes?`<span class="count" title="Devoluções em atraso">${nRes}</span>`:'';
   $('#nav').innerHTML=Object.entries(VIEWS).map(([k,v])=>{const head=v.g!==g?(g=v.g,`<div class="nav-group">${v.g}</div>`):'';
-    return `${head}<button data-view="${k}"${view===k?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${v.i}</svg>${v.t}${badge(k)}</button>`}).join('');
+    return `${head}<button data-view="${k}"${view===k?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${v.i}</svg>${v.n||v.t}${badge(k)}</button>`}).join('');
   $('#h1').textContent=VIEWS[view].t;
   const hoje=new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   $('#hsub').textContent=view==='painel'?`${S.config.nome||'A sua empresa'} · ${hoje}`:({viaturas:`${S.viaturas.length} viaturas registadas`,motoristas:M(filters.mid)?`Painel do motorista · ${M(filters.mid).nome}`:'Disponibilidade, férias e serviço atual',reservas:'Reservas, entregas e devoluções',clientes:`${S.clientes.length} clientes`,faturas:`Série FT ${TODAY.slice(0,4)} · IVA ${fmt(IVA())}%`,custos:'Abastecimentos, portagens, multas e outras despesas',requisicoes:'Pedidos aos postos, verificação e pagamento (fatura e recibo)',postos:'Postos fornecedores e preço por litro',manutencao:'Manutenção preventiva e histórico de oficina',relatorios:'Custo por quilómetro e rentabilidade por viatura',definicoes:'Emitente das faturas'})[view];
-  $('#topActions').innerHTML=(view==='painel'?`<button class="btn" data-new="reserva">+ Reserva</button><button class="btn" data-new="requisicao">+ Requisição</button><button class="btn" data-new="abast">+ Abastecimento</button><button class="btn" data-new="despesa">+ Despesa</button>`:'')+`<span class="sync ${mode==='db'?'on':''}"><i></i>${mode==='db'?'Guardado na nuvem':mode==='loading'?'A ligar…':'Modo demonstração'}</span>`;
-  $('#demoNote').innerHTML=mode==='demo'?'<div class="demo-note">Modo demonstração: os dados de exemplo e as suas alterações ficam só neste navegador.</div>':'';
+  $('#topActions').innerHTML=(view==='painel'?`<button class="btn" data-new="reserva">+ Reserva</button><button class="btn" data-new="requisicao">+ Requisição</button>`:'')+`<span class="sync ${mode==='db'?'on':''}" title="${mode==='db'?'Os dados ficam na base de dados partilhada.':'Dados de exemplo; as alterações ficam só neste navegador.'}"><i></i>${mode==='db'?'Guardado na nuvem':mode==='loading'?'A ligar…':'Modo demonstração'}</span>`;
+  $('#demoNote').innerHTML=''; // o estado (demonstração / nuvem) já aparece no cabeçalho
   const fn={painel:viewPainel,viaturas:viewViaturas,motoristas:viewMotoristas,custos:viewCustos,requisicoes:viewRequisicoes,postos:viewPostos,manutencao:viewManutencao,reservas:viewReservas,clientes:viewClientes,faturas:viewFaturas,relatorios:viewRelatorios,definicoes:viewDefinicoes}[view];
   const active=document.activeElement; const aid=active&&active.id; const pos=aid&&active.selectionStart;
   $('#view').innerHTML=fn();
@@ -975,11 +941,13 @@ document.addEventListener('click',async e=>{
     if(tr.dataset.cons)return verConsumo(tr.dataset.cons);
     const [t,a,c]=tr.dataset.open.split(':');
     if(t==='rq'){const r=S.requisicoes.find(x=>x.id===a);return r&&verReq(r)}
+    if(t==='fat')return verFatura(a);
     if(t==='mot'){view='motoristas';filters.mid=a;render();return window.scrollTo(0,0)}
-    if(t==='edit'){const o=S[a]?.find(x=>x.id===c);if(!o)return;return ({viaturas:formViatura,clientes:formCliente,postos:formPosto})[a]?.(o)}
+    if(t==='edit'){const o=S[a]?.find(x=>x.id===c);if(!o)return;return ({viaturas:formViatura,clientes:formCliente,postos:formPosto,abastecimentos:formAbast,despesas:formDespesa,reservas:formReserva,planos:formPlano,servicos:formServico})[a]?.(o)}
     return }
   const d=b.dataset;
   try{
+    if(d.more){filters[d.more+'All']=!filters[d.more+'All'];return render()}
     if(d.cons)return verConsumo(d.cons);
     if(d.hall){filters.hAll=d.hall==='1';return verConsumo(filters.hv)}
     if(d.abastv)return formAbast({viaturaId:d.abastv});
@@ -988,7 +956,7 @@ document.addEventListener('click',async e=>{
     if(d.rqver){const r=RQ(d.rqver);return r&&r.estado==='pendente'&&verificarReq(r)}
     if(d.rqpag){const r=RQ(d.rqpag);return r&&r.estado==='verificada'&&pagarReq(r)}
     if(d.rqvi){const r=RQ(d.rqvi);return r&&verReq(r)}
-    if(d.rqanular){ if(b.dataset.armed){await patch('requisicoes',d.rqanular,{estado:'anulada'});return toast('Requisição anulada.')} b.dataset.armed='1';b.textContent='Confirmar?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Anular'}},3000);return }
+    if(d.rqanular){ if(b.dataset.armed){await patch('requisicoes',d.rqanular,{estado:'anulada'});if(!$('#drawer').hidden)closeDrawer();return toast('Requisição anulada.')} b.dataset.armed='1';b.textContent='Confirmar?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Anular'}},3000);return }
     if(d.view)return go(d.view);
     if(d.go&&d.ca){filters.ct='abast';filters.ca=d.ca;filters.per='3m';return go(d.go)}
     if(d.go)return go(d.go);
@@ -1018,6 +986,7 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{ if(e.target.id==='vq'){filters.vq=e.target.value;render()} if(e.target.id==='cq'){filters.cq=e.target.value;render()} if(e.target.id==='mq'){filters.mq=e.target.value;render()} if(e.target.id==='rqq'){filters.rqq=e.target.value;render()} });
 document.addEventListener('change',e=>{ if(e.target.id==='cv'){filters.cv=e.target.value;render()}
   if(e.target.id==='rqv'){filters.rqv=e.target.value;render()}
+  if(e.target.id==='per'){filters.per=e.target.value;render()}
   if(e.target.id==='pDe'||e.target.id==='pAte'){filters[e.target.id]=e.target.value;render()} });
 
 const h=(location.hash||'').slice(1); if(VIEWS[h])view=h;
