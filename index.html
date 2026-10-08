@@ -14,7 +14,7 @@
   <aside class="side">
     <div class="brand"><div class="brand-mark" aria-hidden="true">FM</div><div><b>FrotaMZ</b><small>Gestão de frota</small></div></div>
     <nav class="nav" id="nav" aria-label="Módulos"></nav>
-    <div class="side-foot">Protótipo · valores em meticais (MT) · IVA 16%</div>
+    <div class="side-foot" id="sideUser"></div>
   </aside>
   <main>
     <header class="top">
@@ -35,7 +35,16 @@
     </form>
   </div>
 </div>
-<div id="toast" class="toast" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="busca" class="busca" hidden>
+  <div class="busca-bg" data-bclose></div>
+  <div class="busca-p" role="dialog" aria-modal="true" aria-label="Pesquisar">
+    <input id="bq" type="search" placeholder="Matrícula, cliente, motorista, nº de requisição ou fatura…" autocomplete="off" aria-label="Pesquisar" aria-controls="bres">
+    <ul id="bres" role="listbox"></ul>
+    <div class="busca-f"><span>↑ ↓ navegar</span><span>Enter abrir</span><span>Esc fechar</span></div>
+  </div>
+</div>
+<div id="print" aria-hidden="true"></div>
 <script src="js/sample-data.js"></script>
 <script src="js/app.js"></script>
 </body>
