@@ -312,7 +312,8 @@ window.SAMPLE = {
       "valorPago": 4838.35,
       "formaPag": "Transferência bancária",
       "postoId": "p3",
-      "combustivel": "Diesel"
+      "combustivel": "Diesel",
+      "kmReq": 31100
     },
     {
       "id": "rq2",
@@ -334,7 +335,8 @@ window.SAMPLE = {
       "dataVerif": "2026-09-12",
       "obsVerif": "Talão indica 70 L; pedido era de 60 L",
       "postoId": "p3",
-      "combustivel": "Diesel"
+      "combustivel": "Diesel",
+      "kmReq": 31880
     },
     {
       "id": "rq3",
@@ -355,7 +357,8 @@ window.SAMPLE = {
       "abastecimentoId": "a06",
       "dataVerif": "2026-09-22",
       "postoId": "p2",
-      "combustivel": "Gasolina"
+      "combustivel": "Gasolina",
+      "kmReq": 91180
     },
     {
       "id": "rq4",
@@ -380,7 +383,8 @@ window.SAMPLE = {
       "valorPago": 2696.07,
       "formaPag": "M-Pesa",
       "postoId": "p2",
-      "combustivel": "Gasolina"
+      "combustivel": "Gasolina",
+      "kmReq": 54280
     },
     {
       "id": "rq5",
@@ -394,7 +398,8 @@ window.SAMPLE = {
       "finalidade": "Preparar viatura para reserva",
       "estado": "pendente",
       "postoId": "p2",
-      "combustivel": "Diesel"
+      "combustivel": "Diesel",
+      "kmReq": 68450
     },
     {
       "id": "rq6",
@@ -407,7 +412,8 @@ window.SAMPLE = {
       "finalidade": "Transfer aeroporto",
       "estado": "pendente",
       "postoId": "p4",
-      "combustivel": "Diesel"
+      "combustivel": "Diesel",
+      "kmReq": 188600
     },
     {
       "id": "rq7",
@@ -420,7 +426,8 @@ window.SAMPLE = {
       "finalidade": "Viatura foi para a oficina",
       "estado": "anulada",
       "postoId": "p2",
-      "combustivel": "Diesel"
+      "combustivel": "Diesel",
+      "kmReq": 142800
     }
   ],
   "abastecimentos": [

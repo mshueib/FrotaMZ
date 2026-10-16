@@ -42,7 +42,9 @@ Para voltar aos dados de exemplo no browser: apagar `localStorage['frotamz-demo-
    `mConflito` (inativo, de férias, já atribuído a outro aluguer no período, carta caduca antes da devolução), `feriasErro`.
    Combustível: `fillCons` (cada abastecimento cobre os km desde o anterior da mesma viatura), `consRef` (viatura `consumoRef`
    ou mediana do histórico com ≥3 medições), `consDesvio` (anormal se acima de `config.toleranciaConsumo`, 20% por omissão).
-   Período: `periodo()` lê `filters.per` (mes, mesant, 3m, ano, tudo, pers + `pDe`/`pAte`), partilhado por Custos e Relatórios;
+   Período: `periodo()` lê `filters.per` (hoje, 7d, 30d, mes, mesant, 3m, ano, tudo, pers + `pDe`/`pAte`), partilhado por todos os ecrãs
+   com datas. `perBar(rotulo)` mostra a lista de períodos e os campos **De / Até sempre visíveis** (escrever uma data passa a
+   "Personalizado"; ✕ = Tudo, `data-per-limpar`);
    `vStats(v, P)` calcula tudo dentro do período. `verConsumo(viaturaId)` abre na gaveta (larga) o histórico de abastecimentos
    com gráfico de consumo vs. referência/limite e o excesso em litros e MT (`data-cons` em linhas `tr` ou botões).
 4. **Vistas**: `viewPainel`, `viewViaturas`, `viewMotoristas` (quadro Disponíveis / Em serviço / De férias + lista; com `filters.mid` mostra `viewMotorista`, o painel individual), `viewReservas`, `viewClientes`, `viewFaturas`, `viewCustos`, `viewManutencao`, `viewRelatorios`, `viewDefinicoes` — devolvem HTML em string; `render()` redesenha tudo.
@@ -142,6 +144,15 @@ o Histórico (devolvidas e canceladas) fica à parte. No Painel, `hojeBar()` tem
 Aluguer com motorista: a reserva pode ter `motoristaId` + `tarifaMotorista` (MT/dia, por omissão a `tarifa` do motorista).
 `resValor` soma viatura + motorista; a fatura ganha a linha "Serviço de motorista". Sem motorista, o cliente conduz (`condutores`).
 
+## Faturação
+
+`viewFaturas` separada por fase (cartões no topo filtram, `filters.fs`): **1 Por faturar** (reservas devolvidas sem fatura,
+botão Emitir fatura) → **2 Por receber · não pagas** (`estado:'pendente'`, ordenadas por vencimento; "Vencida há N dias" /
+"Vence em N dias"; botão **Registar pagamento** = `receberFatura`) → **✓ Recebidas · pagas** (`estado:'paga'`, com data, forma e
+referência; filtradas pelo período). Vencimento = `f.vencimento` (gravado ao emitir) ou `data + PRAZO_FAT()` (config `prazoFatura`,
+15 dias). As **datas** (no topo) filtram as três fases: devolução, emissão e pagamento; o que fica fora aparece como "+N fora
+das datas" com atalho "Ver todas as datas". O documento mostra o vencimento e um carimbo "PAGA a … · forma · ref." ou "POR PAGAR · vence a …". Alerta "Fatura vencida".
+
 ## Painel de pagamentos
 
 Vista `viewPagamentos` (menu Análise → "Pagamentos"; admin, gestor, contabilista, consulta). `movimentos()` monta um livro único
@@ -166,7 +177,9 @@ confirmou", `confPor`) → `confirmado`. Também `anulado` (só por pagar, com D
 
 ## Requisições de combustível
 
-Coleção `requisicoes`. O `numero` é **digitado à mão** (nº do livro de requisições), normalizado com `normNum` e único (ignora espaços e maiúsculas). `pendente` (por verificar) → **Verificar** (`verificarReq`: litros/preço reais e km;
+Coleção `requisicoes`. Ao emitir regista **`kmReq`** (conta-quilómetros da viatura; obrigatório, não pode ser inferior a
+`ultimoKm(viatura)` e atualiza o km da viatura); aparece na ficha, na lista, no impresso e pré-preenche os km da verificação.
+O `numero` é **digitado à mão** (nº do livro de requisições), normalizado com `normNum` e único (ignora espaços e maiúsculas). `pendente` (por verificar) → **Verificar** (`verificarReq`: litros/preço reais e km;
 cria o abastecimento com `requisicaoId` e grava `abastecimentoId`, `valorReal`) → `verificada` (por pagar) → **Pagar** (`pagarReq`:
 `faturaNr`, `reciboNr`, `dataPag`, `valorPago`, `formaPag`) → `paga`. Também `anulada`. Várias requisições podem partilhar a mesma
 fatura do posto (faturação mensal), por isso não há bloqueio de duplicados. Alertas: por verificar há >7 dias, por pagar há >30 dias.

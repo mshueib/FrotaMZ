@@ -399,3 +399,12 @@ tr.lvl-warn td:first-child{box-shadow:inset 4px 0 0 var(--amber)}
 .calc .cl.off s{margin-right:6px}
 .lev-atraso{background:var(--crit-soft);color:var(--crit);padding:10px 12px;border-radius:7px;margin:-10px -12px;line-height:1.5}
 .tipo-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}
+.rs-card.ok .ico{background:var(--ok-soft);color:var(--ok)}
+.rs-sec.ok .panel-h{border-top:3px solid var(--ok)} .rs-sec.ok .panel-h h2 span{background:var(--ok-soft);color:var(--ok)}
+.inv .carimbo{margin-top:12px;display:inline-block;padding:6px 12px;border:2px solid;border-radius:6px;font-weight:700;letter-spacing:.04em;font-size:13px}
+.inv .carimbo.pago{color:#27774A;border-color:#27774A}
+.inv .carimbo.pend{color:#9A6512;border-color:#9A6512}
+/* filtro de datas */
+.datas{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
+.per .per-l{font-size:12.5px;font-weight:600;color:var(--muted)}
+.datas .dates .search{width:auto;padding:7px 10px}
